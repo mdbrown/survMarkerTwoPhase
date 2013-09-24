@@ -41,22 +41,9 @@ survMTP.estimate <- function(time, event, marker, weights, study.design = "Case-
   names(mydata) = c("xi", "di", "Y")
   mydata$wi = weights
   
-  if(SEmethod == "normal"){
 
-    myests <- getEstimates( data = mydata, cutpoint = cutoff,  measures = measures, predict.time = predict.time, CalVar = TRUE, cutoff.type = cutoff.type, cutoffN, subcohort)
+  myests <- getEstimates( data = mydata, cutpoint = cutoff,  measures = measures, predict.time = predict.time, CalVar = TRUE, cutoff.type = cutoff.type, cutoffN, subcohort)
    
-  }else if(substr(SEmethod, 1,4)=="boot"){
-    bootstraps = round(bootstraps)
-    if(bootstraps <= 1) stop("bootstraps must be larger than 1")
-    myests <- getEstimates( data = mydata, cutpoint = cutoff,  measures = measures, predict.time = predict.time, CalVar = FALSE)
-    
-    #bootstrap ci's
-    bootests <- matrix(ncol = length(myests$est), nrow = bootstraps)
-    for( b in 1:bootstraps){
-      bootests[b,] <- getEstimates( data = mydata[sample(1:N, replace = TRUE),], cutpoint = cutoff,  measures = measures, predict.time = predict.time, CalVar = FALSE)$est    
-    }
-    myests$se <- apply(bootests, 2, sd)
-  }
   
    
   #calculate confidence intervals
