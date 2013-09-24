@@ -11,13 +11,13 @@
 getEstimates <- function(data, 
                        cutpoint,  
                        measures,
-                       predict.time,
+                       predict.time, cohortN, 
                        CalVar, cutoff.type = "none", cutoffN = 100, subcohort=FALSE)
 {  
   
 #  browser()
   
-  N = nrow(data)
+  N = cohortN
   data$vi = 1; #data$wi = 1
   cutoff <- cutpoint
   

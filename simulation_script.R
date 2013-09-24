@@ -11,7 +11,7 @@ round(get.Betas(parameter = "AUC", a = .1, predict.time =2, cutoff = 0,
 AUCVec  = c(.5, .6, .7, .8, .9)
 betaVec = c(0, .3247, 0.6759, 1.1220, 1.9387)
 
-NSim = 1000
+NSim = 100
 N <- 500
 #type I and type II estimates 
 type1.estimates <- data.frame("AUC" = numeric(NSim*length(betaVec)),
@@ -81,6 +81,7 @@ tmp <- survMTP.estimate(time =subdat.type1$xi,
                  event = subdat.type1$di, 
                  marker = subdat.type1$Y,
                  weights = subdat.type1$weights,
+                        cohortN = 500, 
                  study.design = "Case-Cohort",
                  measures = "AUC",
                  predict.time = 2, 
@@ -121,6 +122,7 @@ tmp <- survMTP.estimate(time =subdat.type2$xi,
                         event = subdat.type2$di, 
                         marker = subdat.type2$Y,
                         weights = subdat.type2$weights2,
+                        cohortN = 500, 
                         study.design = "Case-Cohort",
                         measures = "AUC",
                         predict.time = 2, 
@@ -176,7 +178,7 @@ ddply(cohort.estimates, "AUC", function(df)c("MeanAUCest" = mean(df$AUCest),
                                              "EmpbetaSE" = sd(df$betaest)))
 
 
-AUC MeanAUCest  MeanAUCSE   EmpAUCSE   beta  MeanbetaEST MeanbetaSE  EmpbetaSE
+  AUC MeanAUCest  MeanAUCSE   EmpAUCSE   beta  MeanbetaEST MeanbetaSE  EmpbetaSE
 1 0.5  0.4980593 0.02546493 0.02610899 0.0000 -0.003161961 0.08171279 0.08499781
 2 0.6  0.6002019 0.02473490 0.02500902 0.3247  0.331674320 0.08282186 0.08386807
 3 0.7  0.6974502 0.02265945 0.02356091 0.6759  0.676506669 0.08618334 0.09093153

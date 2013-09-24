@@ -222,7 +222,7 @@ Est.Wexp<-function(data,N,RT.out,predict.time,uu0Vec,typexVec,typeyVec, resid.sc
 
 
 Est.Var.CCH.trueweights = function(N,Wexp,data,stratum, subcohort) {
-  
+
   cohort.variance = colSums(data$wi*(Wexp/N)^2)
   
  # robust.variance = colSums((data$weights*Wexp/N)^2)

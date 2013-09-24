@@ -1,5 +1,5 @@
  
-survMTP.estimate <- function(time, event, marker, weights, study.design = "Case-Cohort", predict.time, measures = c('all'), 
+survMTP.estimate <- function(time, event, marker, weights, cohortN, study.design = "Case-Cohort", predict.time, measures = c('all'), 
                    cutpoint = median(marker), CImethod = "logit.transformed",
                     alpha=0.05){
   cutoff <- cutpoint
@@ -42,7 +42,7 @@ survMTP.estimate <- function(time, event, marker, weights, study.design = "Case-
   mydata$wi = weights
   
 
-  myests <- getEstimates( data = mydata, cutpoint = cutoff,  measures = measures, predict.time = predict.time, CalVar = TRUE, cutoff.type = cutoff.type, cutoffN, subcohort)
+  myests <- getEstimates( data = mydata, cutpoint = cutoff,  measures = measures, predict.time = predict.time, cohortN = cohortN, CalVar = TRUE, cutoff.type = cutoff.type, cutoffN, subcohort)
    
   
    
