@@ -1,0 +1,1 @@
+export(survMTP.estimate, print.SurvMTP)
