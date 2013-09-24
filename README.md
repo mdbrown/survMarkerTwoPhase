@@ -30,11 +30,12 @@ devtools::install_github("survMarkerTwoPhase", "mdbrown")
 ## Downloading survMarkerTwoPhase.zip from
 ## https://github.com/mdbrown/survMarkerTwoPhase/archive/master.zip
 ## Installing package from
-## C:\Users\mdbrown\AppData\Local\Temp\Rtmpwrtxni/survMarkerTwoPhase.zip
-```
-
-```
-## Error: Does not appear to be an R package (no DESCRIPTION)
+## C:\Users\mdbrown\AppData\Local\Temp\RtmpgT33AL/survMarkerTwoPhase.zip
+## Installing survMarkerTwoPhase "C:/PROGRA~1/R/R-30~1.1/bin/x64/R" --vanilla
+## CMD INSTALL \
+## "C:\Users\mdbrown\AppData\Local\Temp\RtmpgT33AL\survMarkerTwoPhase-master"
+## \ --library="C:/Users/mdbrown/Documents/R/win-library/3.0" \
+## --with-keep.source --install-tests
 ```
 
 ```r
