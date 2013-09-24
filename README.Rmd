@@ -150,17 +150,12 @@ survMTP.estimate(time =subCohortData2$survTime,
                  cutpoint = 0)
 
 ```
-
-
-
-
-
-
 For more information see `?survMTP.estimate`. 
 
 
-
 ### References
+Liu D, Cai T, Zheng Y. Evaluating the predictive value of biomarkers with stratified case-cohort design. *Biometrics* 2012, 4: 1219-1227.
+
 Pepe MS, Zheng Y, Jin Y. Evaluating the ROC performance of markers for future events. *Lifetime Data Analysis.* 2008, 14: 86-113.
 
 Zheng Y, Cai T, Pepe MS, Levy, W. Time-dependent predictive values of prognostic biomarkers with failure time outcome. *JASA* 2008, 103: 362-368.

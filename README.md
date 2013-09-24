@@ -30,10 +30,10 @@ devtools::install_github("survMarkerTwoPhase", "mdbrown")
 ## Downloading survMarkerTwoPhase.zip from
 ## https://github.com/mdbrown/survMarkerTwoPhase/archive/master.zip
 ## Installing package from
-## C:\Users\mdbrown\AppData\Local\Temp\RtmpgT33AL/survMarkerTwoPhase.zip
+## C:\Users\mdbrown\AppData\Local\Temp\Rtmp0YeE4Y/survMarkerTwoPhase.zip
 ## Installing survMarkerTwoPhase "C:/PROGRA~1/R/R-30~1.1/bin/x64/R" --vanilla
 ## CMD INSTALL \
-## "C:\Users\mdbrown\AppData\Local\Temp\RtmpgT33AL\survMarkerTwoPhase-master"
+## "C:\Users\mdbrown\AppData\Local\Temp\Rtmp0YeE4Y\survMarkerTwoPhase-master"
 ## \ --library="C:/Users/mdbrown/Documents/R/win-library/3.0" \
 ## --with-keep.source --install-tests
 ```

@@ -101,6 +101,9 @@ survEstMeasures(time =subCohortData$survTime,
 
 }
 \references{
+  Liu D, Cai T, Zheng Y. Evaluating the predictive value of biomarkers
+  with stratified case-cohort design. *Biometrics* 2012, 4: 1219-1227.
+
   Pepe MS, Zheng Y, Jin Y. Evaluating the ROC performance
   of markers for future events. Lifetime Data Analysis.
   2008, 14: 86-113.
