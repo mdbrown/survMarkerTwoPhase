@@ -30,10 +30,10 @@ devtools::install_github("survMarkerTwoPhase", "mdbrown")
 ## Downloading survMarkerTwoPhase.zip from
 ## https://github.com/mdbrown/survMarkerTwoPhase/archive/master.zip
 ## Installing package from
-## C:\Users\mdbrown\AppData\Local\Temp\Rtmp0YeE4Y/survMarkerTwoPhase.zip
+## C:\Users\mdbrown\AppData\Local\Temp\Rtmpi67N8E/survMarkerTwoPhase.zip
 ## Installing survMarkerTwoPhase "C:/PROGRA~1/R/R-30~1.1/bin/x64/R" --vanilla
 ## CMD INSTALL \
-## "C:\Users\mdbrown\AppData\Local\Temp\Rtmp0YeE4Y\survMarkerTwoPhase-master"
+## "C:\Users\mdbrown\AppData\Local\Temp\Rtmpi67N8E\survMarkerTwoPhase-master"
 ## \ --library="C:/Users/mdbrown/Documents/R/win-library/3.0" \
 ## --with-keep.source --install-tests
 ```
@@ -124,8 +124,8 @@ Here we estimate all measures available.
 ```r
 # estimate accuracy measures using only the subcohort data
 survMTP.estimate(time = subCohortData$survTime, event = subCohortData$status, 
-    marker = subCohortData$Y, weights = subCohortData$weights, study.design = "Case-Cohort", 
-    predict.time = 2, cutpoint = 0)
+    marker = subCohortData$Y, weights = subCohortData$weights, cohortN = N, 
+    study.design = "Case-Cohort", predict.time = 2, cutpoint = 0)
 ```
 
 ```
@@ -134,11 +134,11 @@ survMTP.estimate(time = subCohortData$survTime, event = subCohortData$status,
 ## 
 ##         estimate     se      lower 0.95  upper 0.95
 ## coef       1.088     0.167         0.761       1.414 
-## AUC        0.788     0.034         0.713       0.847 
-## TPR(c)     0.770     0.058         0.639       0.864 
-## FPR(c)     0.347     0.057         0.245       0.465 
-## PPV(c)     0.386     0.042         0.308       0.471 
-## NPV(c)     0.909     0.020         0.862       0.942 
+## AUC        0.788     0.032         0.718       0.843 
+## TPR(c)     0.770     0.046         0.668       0.849 
+## FPR(c)     0.347     0.035         0.281       0.419 
+## PPV(c)     0.386     0.035         0.320       0.457 
+## NPV(c)     0.909     0.020         0.863       0.941 
 ## 
 ##  marker cutpoint: c = 0
 ```
@@ -149,8 +149,9 @@ Only estimate the $AUC$ and $TPR(0)$.
 
 ```r
 tmp <- survMTP.estimate(time = subCohortData$survTime, event = subCohortData$status, 
-    marker = subCohortData$Y, weights = subCohortData$weights, study.design = "Case-Cohort", 
-    predict.time = 2, measures = c("AUC", "TPR"), cutpoint = 0)
+    marker = subCohortData$Y, weights = subCohortData$weights, cohortN = N, 
+    study.design = "Case-Cohort", predict.time = 2, measures = c("AUC", "TPR"), 
+    cutpoint = 0)
 tmp
 ```
 
@@ -160,8 +161,8 @@ tmp
 ## 
 ##         estimate     se      lower 0.95  upper 0.95
 ## coef       1.088     0.167         0.761       1.414 
-## AUC        0.788     0.034         0.713       0.847 
-## TPR(c)     0.770     0.058         0.639       0.864 
+## AUC        0.788     0.032         0.718       0.843 
+## TPR(c)     0.770     0.046         0.668       0.849 
 ## 
 ##  marker cutpoint: c = 0
 ```
@@ -185,9 +186,9 @@ tmp$CIbounds
 ```
 
 ```
-##         coef   AUC    TPR
-## upper 1.4140 0.847 0.8644
-## lower 0.7613 0.713 0.6386
+##         coef    AUC    TPR
+## upper 1.4140 0.8435 0.8485
+## lower 0.7613 0.7185 0.6679
 ```
 
 
@@ -243,8 +244,8 @@ Estimate all measures available.
 ```r
 # estimate accuracy measures using only the subcohort data
 survMTP.estimate(time = subCohortData2$survTime, event = subCohortData2$status, 
-    marker = subCohortData2$Y, weights = subCohortData2$weights2, study.design = "Case-Cohort", 
-    predict.time = 2, cutpoint = 0)
+    marker = subCohortData2$Y, weights = subCohortData2$weights2, cohortN = N, 
+    study.design = "Case-Cohort", predict.time = 2, cutpoint = 0)
 ```
 
 ```
@@ -253,26 +254,21 @@ survMTP.estimate(time = subCohortData2$survTime, event = subCohortData2$status,
 ## 
 ##         estimate     se      lower 0.95  upper 0.95
 ## coef       0.908     0.135         0.644       1.171 
-## AUC        0.751     0.041         0.661       0.823 
-## TPR(c)     0.683     0.090         0.489       0.829 
-## FPR(c)     0.311     0.083         0.175       0.490 
-## PPV(c)     0.423     0.060         0.312       0.544 
-## NPV(c)     0.867     0.028         0.802       0.912 
+## AUC        0.751     0.032         0.683       0.808 
+## TPR(c)     0.683     0.049         0.579       0.771 
+## FPR(c)     0.311     0.037         0.244       0.387 
+## PPV(c)     0.423     0.045         0.338       0.513 
+## NPV(c)     0.867     0.025         0.811       0.908 
 ## 
 ##  marker cutpoint: c = 0
 ```
 
-
-
-
-
-
-
 For more information see `?survMTP.estimate`. 
 
 
-
 ### References
+Liu D, Cai T, Zheng Y. Evaluating the predictive value of biomarkers with stratified case-cohort design. *Biometrics* 2012, 4: 1219-1227.
+
 Pepe MS, Zheng Y, Jin Y. Evaluating the ROC performance of markers for future events. *Lifetime Data Analysis.* 2008, 14: 86-113.
 
 Zheng Y, Cai T, Pepe MS, Levy, W. Time-dependent predictive values of prognostic biomarkers with failure time outcome. *JASA* 2008, 103: 362-368.
