@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+
   <head>
     <meta charset='utf-8' />
     <meta http-equiv="X-UA-Compatible" content="chrome=1" />
@@ -8,7 +8,7 @@
 
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
-    <title>SurvMarkerTwoPhase</title>
+    <title>survMarkerTwoPhase</title>
   </head>
 
   <body>
@@ -18,21 +18,22 @@
         <header class="inner">
           <a id="forkme_banner" href="https://github.com/mdbrown/survMarkerTwoPhase">View on GitHub</a>
 
-          <h1 id="project_title">Survmarkertwophase</h1>
+          <h1 id="project_title">survMarkerTwoPhase</h1>
           <h2 id="project_tagline">Evaluate the prognostic accuracy of a marker under two phase designs.</h2>
 
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/mdbrown/survMarkerTwoPhase/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/mdbrown/survMarkerTwoPhase/tarball/master">Download this project as a tar.gz file</a>
+            </section>
         </header>
     </div>
 
     <!-- MAIN CONTENT -->
-
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-            <h1> **Currently under Developement**</h1>
-    <p><emph>Beta testing is currently under way</emph></p>
-<p>This R package computes semi-parametric estimates of accuracy measures for risk prediction markers from survival data under two phase designs. For now, estimates can be obtained for the the case-cohort study design. Calculations for the nested case-control design will be implemented soon.</p>
+        <p>This R package computes semi-parametric estimates of accuracy measures for risk prediction markers from survival data under two phase designs. For now, estimates can be obtained for the the case-cohort study design. Calculations for the nested case-control design will be implemented soon.</p>
 
-<p>Once sample weights are obtained, the function <code>survMTP.estimate</code> estimates the $AUC$, $TPR(c)$, $FPR(c)$, $PPV(c)$, and $NPV(c)$ for for a specific timepoint and marker cutoff value c. Standard errors, and confidence intervals are also computed. </p>
+<p>Once sample weights are obtained, the function <code>survMTP.estimate</code> estimates the <strong>AUC</strong>, <strong>TPR(c)</strong>, <strong>FPR(c)</strong>, <strong>PPV(c)</strong>, and <strong>NPV(c)</strong> for for a specific timepoint and marker cutoff value c. Standard errors, and confidence intervals are also computed. </p>
 
 <p>For more information, see references below. </p>
 
@@ -42,9 +43,16 @@
 <div class="highlight highlight-r"><pre><span class="c"># download the package from github</span>
 <span class="c">if (!require("devtools")) install.packages("devtools")</span>
 <span class="c">devtools::install_github("survMarkerTwoPhase", "mdbrown")</span>
-
-<span class="c">library(survMarkerTwoPhase)</span>
 </pre></div>
+
+<div class="highlight highlight-r"><pre><span class="c">library(survMarkerTwoPhase)</span>
+</pre></div>
+
+<pre><code>## Loading required package: survival
+</code></pre>
+
+<pre><code>## Loading required package: splines
+</code></pre>
 
 <div class="highlight highlight-r"><pre>
 <span class="c"># simulated data for illustration</span>
@@ -69,7 +77,7 @@
 <h4>
 <a name="type-i" class="anchor" href="#type-i"><span class="octicon octicon-link"></span></a>Type I:</h4>
 
-<p>Sample $n=150$ from entire cohort, and include all participants with observed failures. </p>
+<p>Sample <strong>n=150</strong> from entire cohort, and include all participants with observed failures. </p>
 
 <div class="highlight highlight-r"><pre><span class="c"># generate a sub-cohort from SimData</span>
 <span class="c">set.seed(12321)</span>
@@ -78,9 +86,15 @@
 <span class="c">sampleInd &lt;- rep(0, N)</span>
 
 <span class="c"># sample all with observed failure time. (200 individuals)</span>
-<span class="c">sampleInd[SimData$status == 1] &lt;- 1</span>
+<span class="c">sampleInd[SimData^status == 1] &lt;- 1</span>
+</pre></div>
 
-<span class="c"># sample 150 more observations from the entire data set without replacement</span>
+<pre><code>## Error: object 'status' not found
+</code></pre>
+
+<div class="highlight highlight-r"><pre>
+<span class="c"># sample 150 more observations from the entire data set without</span>
+<span class="c"># replacement</span>
 <span class="c">sampleInd[sample(1:N, 150)] &lt;- 1</span>
 
 <span class="c">table(sampleInd)  #total number of subcohort is 293 </span>
@@ -88,17 +102,17 @@
 
 <pre><code>## sampleInd
 ##   0   1 
-## 207 293
+## 350 150
 </code></pre>
 
-<p>Now we calculate the sample weights $w_i = 1/Pr(Sampled from cohort)$ for each observation included in the sub-cohort. </p>
+<p>Now we calculate the sample weights <em>w = 1/Pr(Sampled from cohort)</em> for each observation included in the sub-cohort. </p>
 
 <div class="highlight highlight-r"><pre>
 <span class="c"># first calculate the Pr(Sampled from cohort) for each observation</span>
 <span class="c">sampleProb &lt;- numeric(500)</span>
 
-<span class="c"># all non-censored observations were sampled, so their sample probability is</span>
-<span class="c"># 1</span>
+<span class="c"># all non-censored observations were sampled, so their sample probability</span>
+<span class="c"># is 1</span>
 <span class="c">sampleProb[SimData$status == 1] &lt;- 1</span>
 <span class="c">sampleProb[SimData$status == 0] &lt;- 150/N</span>
 
@@ -111,29 +125,30 @@
 
 <div class="highlight highlight-r"><pre><span class="c"># estimate accuracy measures using only the subcohort data</span>
 <span class="c">survMTP.estimate(time = subCohortData$survTime, event = subCohortData$status, </span>
-<span class="c">    marker = subCohortData$Y, weights = subCohortData$weights, study.design = "Case-Cohort", </span>
-<span class="c">    predict.time = 2, cutpoint = 0)</span>
+<span class="c">    marker = subCohortData$Y, weights = subCohortData$weights, cohortN = N, </span>
+<span class="c">    study.design = "Case-Cohort", predict.time = 2, cutpoint = 0)</span>
 </pre></div>
 
 <pre><code>## 
 ## Semi-parametric estimates under Case-Cohort study design.
 ## 
 ##         estimate     se      lower 0.95  upper 0.95
-## coef       1.088     0.167         0.761       1.414 
-## AUC        0.788     0.034         0.713       0.847 
-## TPR(c)     0.770     0.058         0.639       0.864 
-## FPR(c)     0.347     0.057         0.245       0.465 
-## PPV(c)     0.386     0.042         0.308       0.471 
-## NPV(c)     0.909     0.020         0.862       0.942 
+## coef       1.480     0.179         1.130       1.831 
+## AUC        0.849     0.027         0.788       0.895 
+## TPR(c)     0.838     0.041         0.742       0.903 
+## FPR(c)     0.311     0.032         0.252       0.377 
+## PPV(c)     0.202     0.035         0.143       0.279 
+## NPV(c)     0.978     0.007         0.959       0.989 
 ## 
 ##  marker cutpoint: c = 0
 </code></pre>
 
-<p>Only estimate the $AUC$ and $TPR(0)$. </p>
+<p>Only estimate the <strong>AUC</strong> and <strong>TPR(0)</strong>. </p>
 
 <div class="highlight highlight-r"><pre><span class="c">tmp &lt;- survMTP.estimate(time = subCohortData$survTime, event = subCohortData$status, </span>
-<span class="c">    marker = subCohortData$Y, weights = subCohortData$weights, study.design = "Case-Cohort", </span>
-<span class="c">    predict.time = 2, measures = c("AUC", "TPR"), cutpoint = 0)</span>
+<span class="c">    marker = subCohortData$Y, weights = subCohortData$weights, cohortN = N, </span>
+<span class="c">    study.design = "Case-Cohort", predict.time = 2, measures = c("AUC", "TPR"), </span>
+<span class="c">    cutpoint = 0)</span>
 <span class="c">tmp</span>
 </pre></div>
 
@@ -141,9 +156,9 @@
 ## Semi-parametric estimates under Case-Cohort study design.
 ## 
 ##         estimate     se      lower 0.95  upper 0.95
-## coef       1.088     0.167         0.761       1.414 
-## AUC        0.788     0.034         0.713       0.847 
-## TPR(c)     0.770     0.058         0.639       0.864 
+## coef       1.480     0.179         1.130       1.831 
+## AUC        0.849     0.027         0.788       0.895 
+## TPR(c)     0.838     0.041         0.742       0.903 
 ## 
 ##  marker cutpoint: c = 0
 </code></pre>
@@ -153,7 +168,7 @@
 </pre></div>
 
 <pre><code>##   coef    AUC    TPR 
-## 1.0876 0.7876 0.7705
+## 1.4804 0.8494 0.8384
 </code></pre>
 
 <div class="highlight highlight-r"><pre>
@@ -161,15 +176,15 @@
 <span class="c">tmp$CIbounds</span>
 </pre></div>
 
-<pre><code>##         coef   AUC    TPR
-## upper 1.4140 0.847 0.8644
-## lower 0.7613 0.713 0.6386
+<pre><code>##        coef    AUC    TPR
+## upper 1.831 0.8955 0.9033
+## lower 1.130 0.7877 0.7424
 </code></pre>
 
 <h4>
 <a name="type-ii" class="anchor" href="#type-ii"><span class="octicon octicon-link"></span></a>Type II:</h4>
 
-<p>In the second sampling design, we sample $n=100$ from the strata of participants with observed failures and $n=100$ from censored individuals. We need to account for this when we calculate the sampling weights. </p>
+<p>In the second sampling design, we sample <strong>n=100</strong> from the strata of participants with observed failures and <strong>n=100</strong> from censored individuals. We need to account for this when we calculate the sampling weights. </p>
 
 <div class="highlight highlight-r"><pre>
 <span class="c"># create a new sample index. 1 if sampled, 0 if not</span>
@@ -210,20 +225,20 @@
 
 <div class="highlight highlight-r"><pre><span class="c"># estimate accuracy measures using only the subcohort data</span>
 <span class="c">survMTP.estimate(time = subCohortData2$survTime, event = subCohortData2$status, </span>
-<span class="c">    marker = subCohortData2$Y, weights = subCohortData2$weights2, study.design = "Case-Cohort", </span>
-<span class="c">    predict.time = 2, cutpoint = 0)</span>
+<span class="c">    marker = subCohortData2$Y, weights = subCohortData2$weights2, cohortN = N, </span>
+<span class="c">    study.design = "Case-Cohort", predict.time = 2, cutpoint = 0)</span>
 </pre></div>
 
 <pre><code>## 
 ## Semi-parametric estimates under Case-Cohort study design.
 ## 
 ##         estimate     se      lower 0.95  upper 0.95
-## coef       0.908     0.135         0.644       1.171 
-## AUC        0.751     0.041         0.661       0.823 
-## TPR(c)     0.683     0.090         0.489       0.829 
-## FPR(c)     0.311     0.083         0.175       0.490 
-## PPV(c)     0.423     0.060         0.312       0.544 
-## NPV(c)     0.867     0.028         0.802       0.912 
+## coef       0.908     0.123         0.666       1.150 
+## AUC        0.751     0.030         0.687       0.805 
+## TPR(c)     0.683     0.046         0.587       0.765 
+## FPR(c)     0.311     0.037         0.243       0.388 
+## PPV(c)     0.423     0.046         0.336       0.515 
+## NPV(c)     0.867     0.022         0.817       0.904 
 ## 
 ##  marker cutpoint: c = 0
 </code></pre>
@@ -233,7 +248,7 @@
 <h3>
 <a name="references" class="anchor" href="#references"><span class="octicon octicon-link"></span></a>References</h3>
 
-<p>Liu D, Cai T, Zheng Y. Evaluating the predictive value of biomarkers with stratified case-cohort design. <em>Biometrics</em> 2012 4, 1219-1227.</p>
+<p>Liu D, Cai T, Zheng Y. Evaluating the predictive value of biomarkers with stratified case-cohort design. <em>Biometrics</em> 2012, 4: 1219-1227.</p>
 
 <p>Pepe MS, Zheng Y, Jin Y. Evaluating the ROC performance of markers for future events. <em>Lifetime Data Analysis.</em> 2008, 14: 86-113.</p>
 
@@ -244,7 +259,7 @@
     <!-- FOOTER  -->
     <div id="footer_wrap" class="outer">
       <footer class="inner">
-        <p class="copyright">Survmarkertwophase maintained by <a href="https://github.com/mdbrown">mdbrown</a></p>
+        <p class="copyright">survMarkerTwoPhase maintained by <a href="https://github.com/mdbrown">mdbrown</a></p>
         <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
