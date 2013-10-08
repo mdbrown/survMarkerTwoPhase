@@ -174,10 +174,6 @@ hljs.initHighlightingOnLoad();
 </script>
 
 
-<!-- MathJax scripts -->
-<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
-
 
 
 </head>
@@ -187,7 +183,7 @@ hljs.initHighlightingOnLoad();
 
 <p>This R package computes semi-parametric estimates of accuracy measures for risk prediction markers from survival data under two phase designs. For now, estimates can be obtained for the the case-cohort study design. Calculations for the nested case-control design will be implemented soon.</p>
 
-<p>Once sample weights are obtained, the function <code>survMTP.estimate</code> estimates the \( AUC \), \( TPR(c) \), \( FPR(c) \), \( PPV(c) \), and \( NPV(c) \) for for a specific timepoint and marker cutoff value c. Standard errors, and confidence intervals are also computed. </p>
+<p>Once sample weights are obtained, the function <code>survMTP.estimate</code> estimates the <strong>AUC</strong>, <strong>TPR&copy;</strong>, <strong>FPR&copy;</strong>, <strong>PPV&copy;</strong>, and <strong>NPV&copy;</strong> for for a specific timepoint and marker cutoff value c. Standard errors, and confidence intervals are also computed. </p>
 
 <p>For more information, see references below. </p>
 
@@ -195,32 +191,16 @@ hljs.initHighlightingOnLoad();
 
 <pre><code class="r"># download the package from github
 if (!require(&quot;devtools&quot;)) install.packages(&quot;devtools&quot;)
+devtools::install_github(&quot;survMarkerTwoPhase&quot;, &quot;mdbrown&quot;)
 </code></pre>
 
-<pre><code>## Loading required package: devtools
+<pre><code class="r">library(survMarkerTwoPhase)
 </code></pre>
 
-<pre><code class="r">devtools::install_github(&quot;survMarkerTwoPhase&quot;, &quot;mdbrown&quot;)
+<pre><code>## Loading required package: survival
 </code></pre>
 
-<pre><code>## Installing github repo(s) survMarkerTwoPhase/master from mdbrown
-## Downloading survMarkerTwoPhase.zip from
-## https://github.com/mdbrown/survMarkerTwoPhase/archive/master.zip
-## Installing package from
-## C:\Users\mdbrown\AppData\Local\Temp\Rtmpi67N8E/survMarkerTwoPhase.zip
-## Installing survMarkerTwoPhase &quot;C:/PROGRA~1/R/R-30~1.1/bin/x64/R&quot; --vanilla
-## CMD INSTALL \
-## &quot;C:\Users\mdbrown\AppData\Local\Temp\Rtmpi67N8E\survMarkerTwoPhase-master&quot;
-## \ --library=&quot;C:/Users/mdbrown/Documents/R/win-library/3.0&quot; \
-## --with-keep.source --install-tests
-</code></pre>
-
-<pre><code class="r">
-
-library(survMarkerTwoPhase)
-</code></pre>
-
-<pre><code>## Loading required package: survival Loading required package: splines
+<pre><code>## Loading required package: splines
 </code></pre>
 
 <pre><code class="r">
@@ -244,7 +224,7 @@ head(SimData)
 
 <p>####Type I: </p>
 
-<p>Sample \( n=150 \) from entire cohort, and include all participants with observed failures. </p>
+<p>Sample <strong>n=150</strong> from entire cohort, and include all participants with observed failures. </p>
 
 <pre><code class="r"># generate a sub-cohort from SimData
 set.seed(12321)
@@ -253,9 +233,15 @@ N &lt;- nrow(SimData)
 sampleInd &lt;- rep(0, N)
 
 # sample all with observed failure time. (200 individuals)
-sampleInd[SimData$status == 1] &lt;- 1
+sampleInd[SimData^status == 1] &lt;- 1
+</code></pre>
 
-# sample 150 more observations from the entire data set without replacement
+<pre><code>## Error: object &#39;status&#39; not found
+</code></pre>
+
+<pre><code class="r">
+# sample 150 more observations from the entire data set without
+# replacement
 sampleInd[sample(1:N, 150)] &lt;- 1
 
 table(sampleInd)  #total number of subcohort is 293 
@@ -263,17 +249,17 @@ table(sampleInd)  #total number of subcohort is 293
 
 <pre><code>## sampleInd
 ##   0   1 
-## 207 293
+## 350 150
 </code></pre>
 
-<p>Now we calculate the sample weights \( w_i = 1/Pr(Sampled from cohort) \) for each observation included in the sub-cohort. </p>
+<p>Now we calculate the sample weights <em>w = 1/Pr(Sampled from cohort)</em> for each observation included in the sub-cohort. </p>
 
 <pre><code class="r">
 # first calculate the Pr(Sampled from cohort) for each observation
 sampleProb &lt;- numeric(500)
 
-# all non-censored observations were sampled, so their sample probability is
-# 1
+# all non-censored observations were sampled, so their sample probability
+# is 1
 sampleProb[SimData$status == 1] &lt;- 1
 sampleProb[SimData$status == 0] &lt;- 150/N
 
@@ -294,17 +280,17 @@ survMTP.estimate(time = subCohortData$survTime, event = subCohortData$status,
 ## Semi-parametric estimates under Case-Cohort study design.
 ## 
 ##         estimate     se      lower 0.95  upper 0.95
-## coef       1.088     0.167         0.761       1.414 
-## AUC        0.788     0.032         0.718       0.843 
-## TPR(c)     0.770     0.046         0.668       0.849 
-## FPR(c)     0.347     0.035         0.281       0.419 
-## PPV(c)     0.386     0.035         0.320       0.457 
-## NPV(c)     0.909     0.020         0.863       0.941 
+## coef       1.480     0.179         1.130       1.831 
+## AUC        0.849     0.027         0.788       0.895 
+## TPR(c)     0.838     0.041         0.742       0.903 
+## FPR(c)     0.311     0.032         0.252       0.377 
+## PPV(c)     0.202     0.035         0.143       0.279 
+## NPV(c)     0.978     0.007         0.959       0.989 
 ## 
 ##  marker cutpoint: c = 0
 </code></pre>
 
-<p>Only estimate the \( AUC \) and \( TPR(0) \). </p>
+<p>Only estimate the <strong>AUC</strong> and <strong>TPR(0)</strong>. </p>
 
 <pre><code class="r">tmp &lt;- survMTP.estimate(time = subCohortData$survTime, event = subCohortData$status, 
     marker = subCohortData$Y, weights = subCohortData$weights, cohortN = N, 
@@ -317,9 +303,9 @@ tmp
 ## Semi-parametric estimates under Case-Cohort study design.
 ## 
 ##         estimate     se      lower 0.95  upper 0.95
-## coef       1.088     0.167         0.761       1.414 
-## AUC        0.788     0.032         0.718       0.843 
-## TPR(c)     0.770     0.046         0.668       0.849 
+## coef       1.480     0.179         1.130       1.831 
+## AUC        0.849     0.027         0.788       0.895 
+## TPR(c)     0.838     0.041         0.742       0.903 
 ## 
 ##  marker cutpoint: c = 0
 </code></pre>
@@ -329,7 +315,7 @@ tmp$estimates
 </code></pre>
 
 <pre><code>##   coef    AUC    TPR 
-## 1.0876 0.7876 0.7705
+## 1.4804 0.8494 0.8384
 </code></pre>
 
 <pre><code class="r">
@@ -337,14 +323,14 @@ tmp$estimates
 tmp$CIbounds
 </code></pre>
 
-<pre><code>##         coef    AUC    TPR
-## upper 1.4140 0.8435 0.8485
-## lower 0.7613 0.7185 0.6679
+<pre><code>##        coef    AUC    TPR
+## upper 1.831 0.8955 0.9033
+## lower 1.130 0.7877 0.7424
 </code></pre>
 
 <p>####Type II: </p>
 
-<p>In the second sampling design, we sample \( n=100 \) from the strata of participants with observed failures and \( n=100 \) from censored individuals. We need to account for this when we calculate the sampling weights. </p>
+<p>In the second sampling design, we sample <strong>n=100</strong> from the strata of participants with observed failures and <strong>n=100</strong> from censored individuals. We need to account for this when we calculate the sampling weights. </p>
 
 <pre><code class="r">
 # create a new sample index. 1 if sampled, 0 if not
@@ -393,12 +379,12 @@ survMTP.estimate(time = subCohortData2$survTime, event = subCohortData2$status,
 ## Semi-parametric estimates under Case-Cohort study design.
 ## 
 ##         estimate     se      lower 0.95  upper 0.95
-## coef       0.908     0.135         0.644       1.171 
-## AUC        0.751     0.032         0.683       0.808 
-## TPR(c)     0.683     0.049         0.579       0.771 
-## FPR(c)     0.311     0.037         0.244       0.387 
-## PPV(c)     0.423     0.045         0.338       0.513 
-## NPV(c)     0.867     0.025         0.811       0.908 
+## coef       0.908     0.123         0.666       1.150 
+## AUC        0.751     0.030         0.687       0.805 
+## TPR(c)     0.683     0.046         0.587       0.765 
+## FPR(c)     0.311     0.037         0.243       0.388 
+## PPV(c)     0.423     0.046         0.336       0.515 
+## NPV(c)     0.867     0.022         0.817       0.904 
 ## 
 ##  marker cutpoint: c = 0
 </code></pre>
