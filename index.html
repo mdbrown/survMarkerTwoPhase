@@ -5,45 +5,66 @@
     <meta charset='utf-8' />
     <meta http-equiv="X-UA-Compatible" content="chrome=1" />
     <meta name="description" content="survMarkerTwoPhase : Evaluate the prognostic accuracy of a marker under two phase designs." />
-
+   <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/bootstrap-responsive.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
     <title>survMarkerTwoPhase</title>
+
+
   </head>
 
   <body>
 
+
+  <div class="navbar navbar-inverse pull-right">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          
+          <div class="nav-collapse collapse">
+            <ul class="nav pull-right">
+
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Prognostic Biomarker Validation <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="http://mdbrown.github.io/survRpackages/">Home</a></li>
+                  <li class="nav-header">R packages</li>
+                  <li><a href="http://mdbrown.github.io/survAccuracyMeasures/">survAccuracyMeasures</a></li>
+                  <li><a href="http://mdbrown.github.io/survMarkerTwoPhase/">survMarkerTwoPhase</a></li>
+                  <li><a href="http://mdbrown.github.io/survCompetingRisk/">survCompetingRisk</a></li>
+                  <li><a href="http://mdbrown.github.io/survNRI/">survNRI</a></li>
+                  <li class="nav-header">Power simulations</li>
+                  <li><a href="http://glimmer.rstudio.com/mdbrown/PowerSAM/">Cohort</a></li>
+                  <li><a href="#">Case-Cohort</a></li>
+                </ul>
+              </li>
+            </ul>
+
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+
     <!-- HEADER -->
     <div id="header_wrap" class="outer">
         <header class="inner">
-          <a id="forkme_banner" href="https://github.com/mdbrown/survMarkerTwoPhase">View on GitHub</a>
 
           <h1 id="project_title">survMarkerTwoPhase</h1>
           <h2 id="project_tagline">Evaluate the prognostic accuracy of a marker under two phase designs.</h2>
 
- 
+           <a id="forkme_banner" href="https://github.com/mdbrown/survMarkerTwoPhase">View on GitHub</a>
+
         </header>
     </div>
 
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
-    <!-- Side bar -->
-    <header>
-        <h3>Content Title</h3>
-
-        <!-- <h3>The Goods</h3> -->
-        <p class="view">Open Source Projects<small>Code that Might be Useful to You</small></p>
-
-        <h3>Follow Me On</h3>
-        <p class="view"><a href="https://github.com/technicalpickles" target="tab">GitHub<small>If coding is your thing</small></a></li>
-        <p class="view"><a href="https://twitter.com/techpickles" target="tab">Twitter<small>If you tweet</small></a></li>
-        <p class="view"><a href="http://technicalpicklejar.tumblr.com" target="tab">Tumblr<small>If you're ADD</small></a></li>
-
-      </header>
-
-    </div>
-
-    
     
       <section id="main_content" class="inner">
         <p>This R package computes semi-parametric estimates of accuracy measures for risk prediction markers from survival data under two phase designs. For now, estimates can be obtained for the the case-cohort study design. Calculations for the nested case-control design will be implemented soon.</p>
@@ -279,7 +300,8 @@
       </footer>
     </div>
 
-    
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
 
   </body>
 </html>

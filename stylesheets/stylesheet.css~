@@ -268,7 +268,7 @@ Full-Width Styles
   border-radius:0; 
 }
 .navbar-inverse .btn-navbar {
-background-image: none;
+background-color: none;
 }
 .navbar-inverse .navbar-inner {
   background: none;
