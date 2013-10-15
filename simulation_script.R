@@ -2,75 +2,64 @@
 
 #need the function to simulate data
 source("../../power/survAccuracyMeasuresPower/subroutines.R")
-
+source("../PowerSAM/subroutines.R")
 #get betas needed for AUC of .5, .6, .7, .8, .9
 
 round(get.Betas(parameter = "AUC", a = .1, predict.time =2, cutoff = 0, 
-                parval.H0 =.7, parval.Ha=.9,  f_x = dnorm ), 4)
+                parval.H0 =.75, parval.Ha=.9,  f_x = dnorm ), 4)
   
 AUCVec  = c(.5, .6, .7, .8, .9)
 betaVec = c(0, .3247, 0.6759, 1.1220, 1.9387)
 
-NSim = 100
-N <- 500
-#type I and type II estimates 
-type1.estimates <- data.frame("AUC" = numeric(NSim*length(betaVec)),
-                              "AUCest" = numeric(NSim*length(betaVec)), 
-                              "AUCSE" = numeric(NSim*length(betaVec)),
-                              "beta" = numeric(NSim*length(betaVec)),
-                              "betaest"= numeric(NSim*length(betaVec)), 
-                              "betaSE" = numeric(NSim*length(betaVec)), 
-                              "subN" = numeric(NSim*length(betaVec)))
-type2.estimates <- data.frame("AUC" = numeric(NSim*length(betaVec)),
-                              "AUCest" = numeric(NSim*length(betaVec)), 
-                              "AUCSE" = numeric(NSim*length(betaVec)),
-                              "beta" = numeric(NSim*length(betaVec)),
-                              "betaest"= numeric(NSim*length(betaVec)), 
-                              "betaSE" = numeric(NSim*length(betaVec)))
-cohort.estimates <- data.frame("AUC" = numeric(NSim*length(betaVec)),
-                              "AUCest" = numeric(NSim*length(betaVec)), 
-                              "AUCSE" = numeric(NSim*length(betaVec)),
-                              "beta" = numeric(NSim*length(betaVec)),
-                              "betaest"= numeric(NSim*length(betaVec)), 
-                              "betaSE" = numeric(NSim*length(betaVec)))
 
+mybeta <- 0.8789
+
+NSim = 1000
+N <- 1000
+#type I and type II estimates 
+cch.1.est <- matrix(ncol = 6, nrow = NSim)
+cch.1.se  <- matrix(ncol = 6, nrow = NSim)
+cch.1.N <- numeric(NSim)
+
+cch.2.est <- matrix(ncol = 6, nrow = NSim)
+cch.2.se  <- matrix(ncol = 6, nrow = NSim)
+
+cohort.est <- matrix(ncol = 6, nrow = NSim)
+cohort.se  <- matrix(ncol = 6, nrow = NSim)
+
+
+setwd(12321)
 index = 0
-for(j in 1:length(AUCVec)){
 
 for( i in 1:NSim){
   index = index + 1; 
 #simulate cohorts with 40% censoring, 500 individuals
 SimData <- SIM.data.singleMarker(nn = N, 
-           beta = betaVec[j], 
+           beta = mybeta, 
            cens.perc = .7)
   
   tmp <- survAM.estimate(time =SimData$xi, 
                           event = SimData$di, 
                           marker = SimData$Y,
-                          measures = "AUC",
                           predict.time = 2, 
                           cutpoint = 0)
- cohort.estimates$AUC[index] = AUCVec[j]
- cohort.estimates$AUCest[index] = tmp$estimates[2]
- cohort.estimates$SE[index] = tmp$se[2]
-  
-  cohort.estimates$beta[index] = betaVec[j]
-  cohort.estimates$betaest[index] <- tmp$estimates[1]
-  cohort.estimates$betaSE[index] <- tmp$se[1]
+ cohort.est[i,] = tmp$estimates
+ cohort.se[i,]  = tmp$se
+
 #CCH type I  
 
 sampleInd <- rep(0, N)
 
-# sample all with observed failure time. (200 individuals)
+# sample all with observed failure time. (300 individuals)
 sampleInd[SimData$di==1] <- 1
 
 #sample 150 more observations from the entire data set without replacement
-sampleInd[sample(1:N, 100)] <- 1
+sampleInd[sample(1:N, 300)] <- 1
 sampleProb <- numeric(N)
 
 #all non-censored observations were sampled, so their sample probability is 1
 sampleProb[SimData$di==1] <- 1 
-sampleProb[SimData$di==0] <- 100/N
+sampleProb[SimData$di==0] <- 300/N
 
 SimData$weights <- 1/sampleProb
 
@@ -81,37 +70,31 @@ tmp <- survMTP.estimate(time =subdat.type1$xi,
                  event = subdat.type1$di, 
                  marker = subdat.type1$Y,
                  weights = subdat.type1$weights,
-                        cohortN = 500, 
+                        cohortN = N, 
                  study.design = "Case-Cohort",
-                 measures = "AUC",
                  predict.time = 2, 
                  cutpoint = 0)
 
-type1.estimates$AUC[index] = AUCVec[j]
-type1.estimates$AUCest[index] = tmp$estimates[2]
-type1.estimates$SE[index] = tmp$se[2]
-type1.estimates$subN[index] = sum(sampleInd)
-  
-  type1.estimates$beta[index] = betaVec[j]
-  type1.estimates$betaest[index] <- tmp$estimates[1]
-  type1.estimates$betaSE[index] <- tmp$se[1]
-#### Type 2
+  cch.1.est[i,] = tmp$estimates
+  cch.1.se[i,]  = tmp$se
+  cch.1.N[i] = sum(sampleInd)
+  #### Type 2
 
 sampleInd <- rep(0, N)
 
 # sample 100 individuals with observed failure time. 
 CaseInd <- c(1:N)[SimData$di==1] 
-sampleInd[sample(CaseInd, 100)] <- 1
+sampleInd[sample(CaseInd, 250)] <- 1
 
 # sample 100 individuals with censored failure time. 
 ControlInd <- c(1:N)[SimData$di==0] 
-sampleInd[sample(ControlInd, 100)] <- 1
+sampleInd[sample(ControlInd, 250)] <- 1
 
 sampleProb <- numeric(500)
 
 #all non-censored observations were sampled
-sampleProb[SimData$di==1] <- 100/length(CaseInd) 
-sampleProb[SimData$di==0] <- 100/length(ControlInd)
+sampleProb[SimData$di==1] <- 250/length(CaseInd) 
+sampleProb[SimData$di==0] <- 250/length(ControlInd)
 
 SimData$weights2 <- 1/sampleProb
 
@@ -122,22 +105,59 @@ tmp <- survMTP.estimate(time =subdat.type2$xi,
                         event = subdat.type2$di, 
                         marker = subdat.type2$Y,
                         weights = subdat.type2$weights2,
-                        cohortN = 500, 
+                        cohortN = N, 
                         study.design = "Case-Cohort",
-                        measures = "AUC",
                         predict.time = 2, 
                         cutpoint = 0)
 
-type2.estimates$AUC[index] = AUCVec[j]
-type2.estimates$AUCest[index] = tmp$estimates[2]
-type2.estimates$SE[index] = tmp$se[2]
-  type2.estimates$beta[index] = betaVec[j]
-  type2.estimates$betaest[index] <- tmp$estimates[1]
-  type2.estimates$betaSE[index] <- tmp$se[1]
-print(paste(AUCVec[j], i, sep = ":"))
+  cch.2.est[i,] = tmp$estimates
+  cch.2.se[i,]  = tmp$se
+
+print(paste( i))
 
 }
-}
+cohort.est <- as.data.frame(cohort.est)
+cohort.se <- as.data.frame(cohort.se)
+
+cch.1.est <- as.data.frame(cch.1.est)
+cch.1.se <- as.data.frame(cch.1.se)
+
+cch.2.est <- as.data.frame(cch.2.est)
+cch.2.se <- as.data.frame(cch.2.se)
+
+names(cch.1.est) <- names(cch.1.se) <- names(cch.2.est) <- names(cch.2.se) <- names(cohort.se) <- names(cohort.est) <- names(tmp$estimates)
+
+
+
+## cohort
+colMeans(cohort.est)
+round(apply(cohort.est, 2, sd) -colMeans(cohort.se), 4)
+
+#type 1
+colMeans(cch.1.est)
+round(apply(cch.1.est, 2, sd) -colMeans(cch.1.se), 4)
+
+#type 1
+colMeans(cch.2.est, na.rm = TRUE)
+round(apply(cch.2.est, 2, sd) -colMeans(cch.2.se), 4)
+
+#make a little table for each 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+load("simOutput.Rdata")
 
 ddply(type1.estimates, "AUC", function(df)c("MeanAUCest" = mean(df$AUCest), 
                                             "MeanAUCSE" = mean(df$SE), 
@@ -147,12 +167,12 @@ ddply(type1.estimates, "AUC", function(df)c("MeanAUCest" = mean(df$AUCest),
                                             "MeanbetaSE" = mean(df$betaSE), 
                                             "EmpbetaSE" = sd(df$betaest)))
 
-AUC MeanAUCest  MeanAUCSE   EmpAUCSE   beta  MeanbetaEST MeanbetaSE EmpbetaSE
-1 0.5  0.4985593 0.06456151 0.04056454 0.0000 -0.001847552  0.2081279 0.1367906
-2 0.6  0.6012137 0.06141551 0.03827648 0.3247  0.346383106  0.2055433 0.1348679
-3 0.7  0.6943891 0.05880387 0.03520918 0.6759  0.691708183  0.2182586 0.1422142
-4 0.8  0.7912670 0.04991397 0.02526562 1.1220  1.147318749  0.2532104 0.1389707
-5 0.9  0.8870104 0.03300787 0.01355715 1.9387  1.964855911  0.3425785 0.1536204
+AUC MeanAUCest   MeanAUCSE    EmpAUCSE   beta  MeanbetaEST MeanbetaSE  EmpbetaSE
+1 0.5  0.4996356 0.024684076 0.025140983 0.0000 0.0009909321 0.07892750 0.08205906
+2 0.6  0.5992227 0.023699374 0.023975690 0.3247 0.3294330829 0.07993058 0.08161297
+3 0.7  0.6970220 0.020989044 0.022175399 0.6759 0.6780287405 0.08128971 0.08745908
+4 0.8  0.7974996 0.015663825 0.016393401 1.1220 1.1319576301 0.08445859 0.09303013
+5 0.9  0.8954575 0.008856503 0.008975003 1.9387 1.9497646535 0.09875168 0.10606743
 
 ddply(type2.estimates, "AUC", function(df)c("MeanAUCest" = mean(df$AUCest), 
                                             "MeanAUCSE" = mean(df$SE), 
@@ -161,13 +181,12 @@ ddply(type2.estimates, "AUC", function(df)c("MeanAUCest" = mean(df$AUCest),
                                             "MeanbetaEST" = mean(df$betaest), 
                                             "MeanbetaSE" = mean(df$betaSE), 
                                             "EmpbetaSE" = sd(df$betaest)))
-AUC MeanAUCest  MeanAUCSE   EmpAUCSE   beta  MeanbetaEST MeanbetaSE EmpbetaSE
-1 0.5  0.4974704 0.05044440 0.03847457 0.0000 -0.001571789  0.1609316 0.1287296
-2 0.6  0.5991513 0.04956048 0.03638392 0.3247  0.339899843  0.1628435 0.1248197
-3 0.7  0.6954977 0.04872714 0.03352307 0.6759  0.690574201  0.1711999 0.1347761
-4 0.8  0.7931464 0.04302921 0.02532747 1.1220  1.140682976  0.1948035 0.1367206
-5 0.9  0.8905602 0.02970482 0.01418483 1.9387  1.957841713  0.2609241 0.1652734
-
+AUC MeanAUCest   MeanAUCSE    EmpAUCSE   beta MeanbetaEST MeanbetaSE  EmpbetaSE
+1 0.5  0.5000122 0.024210693 0.024425194 0.0000 0.002818663 0.07756309 0.07975210
+2 0.6  0.5977038 0.023389232 0.023178463 0.3247 0.324607724 0.07875714 0.07821797
+3 0.7  0.6976133 0.020921332 0.021488859 0.6759 0.679432705 0.08072867 0.08205567
+4 0.8  0.7981976 0.015923229 0.016440535 1.1220 1.129830649 0.08518855 0.09043359
+5 0.9  0.8962485 0.009183705 0.009503245 1.9387 1.946625503 0.10322186 0.10839158
 
 ddply(cohort.estimates, "AUC", function(df)c("MeanAUCest" = mean(df$AUCest), 
                                              "MeanAUCSE" = mean(df$SE), 
@@ -178,11 +197,11 @@ ddply(cohort.estimates, "AUC", function(df)c("MeanAUCest" = mean(df$AUCest),
                                              "EmpbetaSE" = sd(df$betaest)))
 
 
-  AUC MeanAUCest  MeanAUCSE   EmpAUCSE   beta  MeanbetaEST MeanbetaSE  EmpbetaSE
-1 0.5  0.4980593 0.02546493 0.02610899 0.0000 -0.003161961 0.08171279 0.08499781
-2 0.6  0.6002019 0.02473490 0.02500902 0.3247  0.331674320 0.08282186 0.08386807
-3 0.7  0.6974502 0.02265945 0.02356091 0.6759  0.676506669 0.08618334 0.09093153
-4 0.8  0.7983985 0.01801694 0.01862269 1.1220  1.132438389 0.09597059 0.09784758
-5 0.9  0.8970353 0.01084510 0.01068358 1.9387  1.947708803 0.12473059 0.12548687
+AUC MeanAUCest   MeanAUCSE   EmpAUCSE   beta  MeanbetaEST MeanbetaSE  EmpbetaSE
+1 0.5  0.4995863 0.018013997 0.01797672 0.0000 0.0003545359 0.05774681 0.05793222
+2 0.6  0.5989182 0.017564602 0.01731011 0.3247 0.3241587557 0.05849438 0.05769291
+3 0.7  0.6980886 0.016121246 0.01699209 0.6759 0.6735228188 0.06102150 0.06379761
+4 0.8  0.7995466 0.012828753 0.01342071 1.1220 1.1263176713 0.06791604 0.07256237
+5 0.9  0.8984744 0.007675964 0.00784358 1.9387 1.9428456342 0.08776859 0.09003101
 
 
