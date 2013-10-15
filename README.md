@@ -257,6 +257,30 @@ survMTP.estimate(time = subCohortData2$survTime, event = subCohortData2$status,
 
 For more information see `?survMTP.estimate`. 
 
+### Validation of R package
+To validate the accuracy of estimates produced by the package, we ran several simulations under many different scenarios. Results for a single example, where <em>AUC = 0.75</em> is shown below. 1,000 cohort data sets were simulated from a proportional hazards model with sample size <em>n = 1,000</em> and <em>70%</em> censoring. Type I and II case cohort samples were collected from each simulated cohort and all summary measures were estimated. For the type I CCH design, a subcohort of size 300 was selected along with everyone with observed failure times (the mean sample size for this design was 510). For type II 250 cases and 250 controls were selected. Mean estimates for summary measures and SE are shown, which can be compared to the true measure values and the empirical SE, respectively.
+
+
+#### Type I 
+        | True Value | Mean(Est.) | Emp. SE | Mean(Est. SE)
+--------|------------|----------|---------|-----------    
+     β  |  0.879  |  0.875  | 0.067 |      0.064
+    AUC |   0.750 |  0.747 | 0.016  |    0.015
+ TPR(0) |   0.770 |  0.767 | 0.020  |    0.020
+ FPR(0) |   0.420 |  0.420 | 0.018  |    0.017
+ PPV(0) |   0.350 |  0.347 | 0.021  |    0.021
+ NPV(0) |   0.900 |  0.895 | 0.011  |    0.011
+
+#### Type II
+        | True Value | Mean(Est.) | Emp. SE | Mean(Est. SE)
+--------|------------|----------|---------|----------- 
+      β |   0.879 |   0.882  |0.083  |    0.082
+    AUC |   0.750 |   0.747  |0.019  |    0.019
+ TPR(0) |   0.770 |   0.770  |0.025  |    0.024
+ FPR(0) |   0.420 |   0.421  |0.026 |     0.026
+ PPV(0) |   0.350 |   0.350  |0.024 |     0.024
+ NPV(0) |   0.900 |   0.895  |0.012 |     0.012
+
 
 ### References
 Liu D, Cai T, Zheng Y. Evaluating the predictive value of biomarkers with stratified case-cohort design. *Biometrics* 2012, 4: 1219-1227.
