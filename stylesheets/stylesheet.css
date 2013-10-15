@@ -297,6 +297,7 @@ background-image: none;
   width:200%;
   top:0;
   right: -10px;
+  left: 0;
   z-index: 10;
   padding: 10px 50px 10px 10px;
   color: #fff;
