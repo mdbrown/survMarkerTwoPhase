@@ -43,7 +43,7 @@ N <- nrow(SimData)
 sampleInd <- rep(0, N)
 
 # sample all with observed failure time. (200 individuals)
-sampleInd[SimData**status==1] <- 1
+sampleInd[SimData$status==1] <- 1
 
 #sample 150 more observations from the entire data set without replacement
 sampleInd[sample(1:N, 150)] <- 1
@@ -59,8 +59,10 @@ sampleProb <- numeric(500)
 
 #all non-censored observations were sampled, so their sample probability is 1
 sampleProb[SimData$status==1] <- 1 
+#all other individuals had a 150/N chance to be sampled 
 sampleProb[SimData$status==0] <- 150/N
 
+#the sample weights are 1/(probability of being sampled)
 SimData$weights <- 1/sampleProb
 
 subCohortData <- SimData[sampleInd==1,]
