@@ -1,37 +1,59 @@
-prepareDataSP <- function(time, event, marker){
+prepareDataSP <- function(time, event, marker, weights, 
+                          subcohort.data){
   
   #probably put some checks here
   
-  outData <- as.data.frame(cbind(time, event, marker, 1)) # add vector of 1s for sample weights used later
+  outData <- as.data.frame(subcohort.data[,c(time, event, marker, weights)]) # add vector of 1s for sample weights used later
 
   names(outData) <- c("xi", "di", "Y", "wi")
   completeCases <- complete.cases(outData)
-  if(sum(completeCases) < nrow(outData)) warning(paste("NA's present, only complete cases will be used. New sample size is:", sum(completeCases)) )
-  outData <- outData[complete.cases(outData), ]
+  if(sum(completeCases) < nrow(outData)) warning(paste("NA's present, only complete cases will be used. New subcohort sample size is:", sum(completeCases)) )
+  outData <- outData[completeCases, ]
   
   outData
   
 }
 
 
-prepareDataNP <- function(time, event, marker){
-  N = length(time)
+prepareDataNP <- function(time, event, marker, weights, 
+                          subcohort.data, 
+                          cohort.data){
+  
+  #remove NA's from subcohort data
+  tmpData <- as.data.frame(subcohort.data[,c(time, event, marker, weights)]) # add vector of 1s for sample weights used later
+  
+  completeCases <- complete.cases(tmpData)
+  if(sum(completeCases) < nrow(tmpData)) warning(paste("NA's present in subcohort data, only complete cases will be used. New subcohort sample size is:", sum(completeCases)) )
+  subcohort.data <- tmpData[completeCases, ]
+  
+  #remove NA's from cohort data
+  tmpData <- as.data.frame(cohort.data[,c(time, event)]) 
+  
+  completeCases <- complete.cases(tmpData)
+  if(sum(completeCases) < nrow(tmpData)) warning(paste("NA's present in cohort data, only complete cases will be used. New cohort sample size is:", sum(completeCases)) )
+  cohort.data <- tmpData[completeCases, ]
+  
+  
+  N = dim(cohort.data)[1]
+  subN = dim(subcohort.data)[1]
   
   #calculate censoring weights
-  psi = rep(0, N)
-  for( eventID in unique(event)){
-     psi[is.element(event, eventID)] <- sum(is.element(event, eventID))/N
+  psi = rep(0, subN)
+  subdata.event <- subcohort.data[,event]
+  for( eventID in unique(subdata.event)){
+     psi[is.element(subdata.event, eventID)] <- sum(is.element(cohort.data[,event], eventID))/N
   }
   
-  outData <- data.frame(cbind(time, event, marker, 1, 0, event+1, psi, 1))  
-  names(outData) = c("xi","di","yi","vi","zi","si","psi", "wi")
+  subcohort.outData <- data.frame(cbind( subcohort.data[,c(time, event, marker)],
+                                          0, subdata.event+1, psi, subcohort.data[,weights]))  
+  names(subcohort.outData) = c("xi","di","yi","zi","si","psi", "wi")
   
-  completeCases <- complete.cases(outData)
-  if(sum(completeCases) < nrow(outData)) warning(paste("NA's present, only complete cases will be used. New sample size is:", sum(completeCases)) )
-  outData <- outData[complete.cases(outData), ]
-
-  outData
-  
+  cohort.outData        <- cohort.data[,c(time, event)]
+  names(cohort.outData) <- c("xi", "di")
+  out <- NULL
+  out$subdata <- subcohort.outData
+  out$cohortdata <- cohort.outData
+  out
 }
 
 processRawOutput <- function(myests, CImethod, alpha){

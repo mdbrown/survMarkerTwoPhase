@@ -1,6 +1,7 @@
 
 
-getEstimatesNP <- function(data, 
+getEstimatesNP <- function(subcohort.data, 
+                           cohort.data,
                          cutpoint,  
                          measures,
                          predict.time,
@@ -11,8 +12,9 @@ getEstimatesNP <- function(data,
   
   
 
-  N = nrow(data); ## cohort size
-  data0 <- data #unsorted data
+  N = nrow(cohort.data); ## cohort size
+  data0 <- cohort.data #unsorted data
+  data  <- subcohort.data
   data = data [order(data$yi),] ## sorted by marker
   
   ck = data$yi;     

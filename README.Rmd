@@ -67,16 +67,38 @@ SimData$weights <- 1/sampleProb
 
 subCohortData <- SimData[sampleInd==1,]
 ```
-
-Here we estimate all measures available. 
+Here we estimate all measures available using non-parametric estimation methods. 
 
 ```{r}
-#estimate accuracy measures using only the subcohort data
-survMTP.estimate(time =subCohortData$survTime, 
-                event = subCohortData$status, 
-                marker = subCohortData$Y,
-                weights = subCohortData$weights,
-                 cohortN = N,
+#estimate accuracy measures using non-parametric estimates
+#by setting ESTmethod = "NP"
+# we have to supply subcohort data and full cohort data
+survMTP.estimate(time ="survTime", 
+                event = "status", 
+                marker = "Y",
+                weights = "weights",
+                 subcohort.data = subCohortData, 
+                 cohort.data = SimData, 
+                 cohort.size = N,
+                 estimation.method = "NP",  
+                study.design = "Case-Cohort",
+                predict.time = 2, 
+                 cutpoint = 0)
+
+```
+
+Now estimate all measures  using semi-parametric estimation methods. 
+
+```{r}
+#estimate accuracy measures using semi-parametric estimates, 
+# we only need the sub-cohort data here 
+survMTP.estimate(time ="survTime", 
+                event = "status", 
+                marker = "Y",
+                weights = "weights",
+                 subcohort.data = subCohortData, 
+                 cohort.size = N,
+                 estimation.method = "SP",
                 study.design = "Case-Cohort",
                 predict.time = 2, 
                  cutpoint = 0)

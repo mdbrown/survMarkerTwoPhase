@@ -11,8 +11,9 @@ print.SurvMTP <- function(x, ...){
   # just like coxph
   
   #x is a list with elements 'estimates', 'se', 'CIbounds', 'cutoff', 'CImethod', 'SEmethod', and 'predict.time'
-  cat(paste("\nSemi-parametric estimates under", x$study.design, "study design.\n"))
+  cat(paste("\n",x$estimation.method, "estimates under", x$study.design, "study design.\n"))
   cat("\n")
+
   mynames = names(x$estimates)
   
   if(any(mynames %in% c("FPR", "TPR" , "NPV" , "PPV"))){
@@ -21,20 +22,21 @@ print.SurvMTP <- function(x, ...){
     whitespace <- rep(" ", 4)
   }
   
-  cat(whitespace, paste("estimate     se      lower ",
-            1-x$alpha, "  upper ",
-            1-x$alpha, "\n",sep = ""))
+  cat(whitespace, "estimate")
+            #paste("estimate     se      lower ",
+            #1-x$alpha, "  upper ",
+            #1-x$alpha, "\n",sep = ""))
   
-  
+  cat("\n")
 
   for(i in 1:length(mynames)){
     if(mynames[i] %in% c("FPR", "TPR" , "NPV" , "PPV") ) mynames[i] = paste(mynames[i], "(c)", sep = "")
     cat(paste(sprintf("%-6s", mynames[i]), 
               sprintf("%10.3f", round(x$estimate[i], 3)), 
-              sprintf("%10.3f ", round(x$se[i], 3)), 
-              sprintf("%13.3f ", round(x$CIbounds[2,i], 3)), 
-              sprintf("%11.3f ", round(x$CIbounds[1,i], 3))
-              , sep = "")); 
+            #  sprintf("%10.3f ", round(x$se[i], 3)), 
+            #  sprintf("%13.3f ", round(x$CIbounds[2,i], 3)), 
+            #  sprintf("%11.3f ", round(x$CIbounds[1,i], 3)),
+               sep = "")); 
     cat("\n")
     
   }
