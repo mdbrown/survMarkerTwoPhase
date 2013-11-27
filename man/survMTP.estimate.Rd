@@ -58,12 +58,6 @@
 }
 \examples{
 data(SimData)
-
-tmp <- survEstMeasures(time =SimData$survTime, event = SimData$status, marker = SimData$Y, predict.time = 2, cutpoint = 0)
-tmp
-
-survEstMeasures(time =SimData$survTime, event = SimData$status, marker = SimData$Y, predict.time = 2, measures = c("AUC", "TPR"), SEmethod = 'bootstrap', bootstraps = 50, cutpoint = 0)
-
 #generate a sub-cohort from SimData
 set.seed(12321)
 #create a sample index. 1 if sampled, 0 if not
@@ -78,24 +72,47 @@ sampleInd[sample(1:N, 150)] <- 1
 
 table(sampleInd) #total number of subcohort is 293 
 
-## now calculate sample weights
 #first calculate the Pr(Sampled from cohort) for each observation
 sampleProb <- numeric(500)
+
 #all non-censored observations were sampled, so their sample probability is 1
 sampleProb[SimData$status==1] <- 1 
+#all other individuals had a 150/N chance to be sampled 
 sampleProb[SimData$status==0] <- 150/N
 
+#the sample weights are 1/(probability of being sampled)
 SimData$weights <- 1/sampleProb
 
 subCohortData <- SimData[sampleInd==1,]
 
-#estimate accuracy measures using only the subcohort data
-survEstMeasures(time =subCohortData$survTime, 
-                event = subCohortData$status, 
-                marker = subCohortData$Y,
-                weights = subCohortData$weights, 
+#estimate accuracy measures using non-parametric estimates
+#by setting ESTmethod = "NP"
+# we have to supply subcohort data and full cohort data
+survMTP.estimate(time ="survTime", 
+                 event = "status", 
+                 marker = "Y",
+                 weights = "weights",
+                 subcohort.data = subCohortData, 
+                 cohort.data = SimData, 
+                 cohort.size = N,
+                 estimation.method = "NP",  
+                 study.design = "Case-Cohort",
+                 predict.time = 2, 
+                 cutpoint = 0)
+
+
+#estimate accuracy measures using semi-parametric estimates, 
+# we only need the sub-cohort data here 
+survMTP.estimate(time ="survTime", 
+                event = "status", 
+                marker = "Y",
+                weights = "weights",
+                 subcohort.data = subCohortData, 
+                 cohort.size = N,
+                 estimation.method = "SP",
+                study.design = "Case-Cohort",
                 predict.time = 2, 
-                 cutpoint = 0, SEmethod = "normal")
+                 cutpoint = 0)
 
 
 

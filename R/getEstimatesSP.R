@@ -97,8 +97,10 @@ getEstimatesSP <- function(data,
   }
   
   
-  if("AUC" %in% measures) est = c(betahat, AUC, RTvp.out )  else est = c(betahat, RTvp.out)
-  est <- data.frame(est); names(est) = c("coef", measures)
+  if("AUC" %in% measures) est = unlist(c(betahat, AUC, RTvp.out ))  else est = unlist(c(betahat, RTvp.out))
+
+  est <- data.frame(t(est)); 
+  names(est) = c("coef", measures)
   
   if (CalVar)  {
 

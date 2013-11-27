@@ -1,9 +1,9 @@
 survMarkerTwoPhase
 =============================================
 
-This R package computes semi-parametric estimates of accuracy measures for risk prediction markers from survival data under two phase designs. For now, estimates can be obtained for the the case-cohort study design. Calculations for the nested case-control design will be implemented soon.
+This R package computes non-parametric and semi-parametric estimates of accuracy measures for risk prediction markers from survival data under two phase designs. For now, estimates can be obtained for the the case-cohort study design. Calculations for the nested case-control design will be implemented soon. 
 
-Once sample weights are obtained, the function `survMTP.estimate` estimates the **AUC**, **TPR(c)**, **FPR(c)**, **PPV(c)**, and **NPV(c)** for for a specific timepoint and marker cutoff value c. Standard errors, and confidence intervals are also computed. 
+Once sample weights are obtained, the function `survMTP.estimate` estimates the **AUC**, **TPR(c)**, **FPR(c)**, **PPV(c)**, and **NPV(c)** for for a specific timepoint and marker cutoff value c.
 
 For more information, see references below. 
 
@@ -54,7 +54,7 @@ head(SimData)
 
 ### Case-Cohort Design
 
-Estimation using a case-cohort subcohort design is permitted. Sample weights must first be calculated based.
+Estimation using a case-cohort subcohort design is permitted. Sample weights must first be calculated.
 
 ####Type I: 
  
@@ -69,14 +69,7 @@ N <- nrow(SimData)
 sampleInd <- rep(0, N)
 
 # sample all with observed failure time. (200 individuals)
-sampleInd[SimData^status == 1] <- 1
-```
-
-```
-## Error: object 'status' not found
-```
-
-```r
+sampleInd[SimData$status == 1] <- 1
 
 # sample 150 more observations from the entire data set without
 # replacement
@@ -88,49 +81,77 @@ table(sampleInd)  #total number of subcohort is 293
 ```
 ## sampleInd
 ##   0   1 
-## 350 150
+## 207 293
 ```
 
 
 Now we calculate the sample weights *w = 1/Pr(Sampled from cohort)* for each observation included in the sub-cohort. 
 
 ```r
-
 # first calculate the Pr(Sampled from cohort) for each observation
 sampleProb <- numeric(500)
 
 # all non-censored observations were sampled, so their sample probability
 # is 1
 sampleProb[SimData$status == 1] <- 1
+# all other individuals had a 150/N chance to be sampled
 sampleProb[SimData$status == 0] <- 150/N
 
+# the sample weights are 1/(probability of being sampled)
 SimData$weights <- 1/sampleProb
 
 subCohortData <- SimData[sampleInd == 1, ]
 ```
 
-
-Here we estimate all measures available. 
+Here we estimate all measures available using non-parametric estimation methods. For non-parametric estimation, we need to provide the subcohort data consisting of status, survival time, marker, and weight, as well as survival time and status for the full cohort.   
 
 
 ```r
-# estimate accuracy measures using only the subcohort data
-survMTP.estimate(time = subCohortData$survTime, event = subCohortData$status, 
-    marker = subCohortData$Y, weights = subCohortData$weights, cohortN = N, 
+# estimate accuracy measures using non-parametric estimates by setting
+# ESTmethod = 'NP' we have to supply subcohort data and full cohort data
+survMTP.estimate(time = "survTime", event = "status", marker = "Y", weights = "weights", 
+    subcohort.data = subCohortData, cohort.data = SimData, cohort.size = N, 
+    estimation.method = "NP", study.design = "Case-Cohort", predict.time = 2, 
+    cutpoint = 0)
+```
+
+```
+## 
+##  Non-parametric estimates under Case-Cohort study design.
+## 
+##         estimate
+## AUC        0.749
+## TPR(c)     0.699
+## FPR(c)     0.394
+## PPV(c)     0.331
+## NPV(c)     0.878
+## 
+##  marker cutpoint: c = 0
+```
+
+
+Now estimate all measures  using semi-parametric estimation methods. These methods assume a Cox proportional hazards model. We only have to provide subcohort data in this case. 
+
+
+```r
+# estimate accuracy measures using semi-parametric estimates, we only need
+# the sub-cohort data here
+survMTP.estimate(time = "survTime", event = "status", marker = "Y", weights = "weights", 
+    subcohort.data = subCohortData, cohort.size = N, estimation.method = "SP", 
     study.design = "Case-Cohort", predict.time = 2, cutpoint = 0)
 ```
 
 ```
 ## 
-## Semi-parametric estimates under Case-Cohort study design.
+##  Semi-parametric estimates under Case-Cohort study design.
 ## 
-##         estimate     se      lower 0.95  upper 0.95
-## coef       1.480     0.179         1.130       1.831 
-## AUC        0.849     0.027         0.788       0.895 
-## TPR(c)     0.838     0.041         0.742       0.903 
-## FPR(c)     0.311     0.032         0.252       0.377 
-## PPV(c)     0.202     0.035         0.143       0.279 
-## NPV(c)     0.978     0.007         0.959       0.989 
+##         estimate
+## coef       1.088
+## AUC        0.788
+## TPR(c)     0.770
+## FPR(c)     0.347
+## PPV(c)     0.386
+## NPV(c)     0.909
 ## 
 ##  marker cutpoint: c = 0
 ```
@@ -140,21 +161,21 @@ Only estimate the **AUC** and **TPR(0)**.
 
 
 ```r
-tmp <- survMTP.estimate(time = subCohortData$survTime, event = subCohortData$status, 
-    marker = subCohortData$Y, weights = subCohortData$weights, cohortN = N, 
-    study.design = "Case-Cohort", predict.time = 2, measures = c("AUC", "TPR"), 
+tmp <- survMTP.estimate(time = "survTime", event = "status", marker = "Y", weights = "weights", 
+    subcohort.data = subCohortData, cohort.size = N, study.design = "Case-Cohort", 
+    estimation.method = "SP", predict.time = 2, measures = c("AUC", "TPR"), 
     cutpoint = 0)
 tmp
 ```
 
 ```
 ## 
-## Semi-parametric estimates under Case-Cohort study design.
+##  Semi-parametric estimates under Case-Cohort study design.
 ## 
-##         estimate     se      lower 0.95  upper 0.95
-## coef       1.480     0.179         1.130       1.831 
-## AUC        0.849     0.027         0.788       0.895 
-## TPR(c)     0.838     0.041         0.742       0.903 
+##         estimate
+## coef       1.088
+## AUC        0.788
+## TPR(c)     0.770
 ## 
 ##  marker cutpoint: c = 0
 ```
@@ -167,20 +188,8 @@ tmp$estimates
 ```
 
 ```
-##   coef    AUC    TPR 
-## 1.4804 0.8494 0.8384
-```
-
-```r
-
-# and the confidence bounds
-tmp$CIbounds
-```
-
-```
-##        coef    AUC    TPR
-## upper 1.831 0.8955 0.9033
-## lower 1.130 0.7877 0.7424
+##    coef    AUC    TPR
+## 1 1.088 0.7876 0.7705
 ```
 
 
@@ -190,7 +199,6 @@ In the second sampling design, we sample **n=100** from the strata of participan
 
 
 ```r
-
 # create a new sample index. 1 if sampled, 0 if not
 sampleInd <- rep(0, N)
 
@@ -216,7 +224,6 @@ Calculate the sample weights.
 
 
 ```r
-
 # first calculate the Pr(Sampled from cohort) for each observation
 sampleProb <- numeric(500)
 
@@ -230,56 +237,55 @@ subCohortData2 <- SimData[sampleInd == 1, ]
 ```
 
 
-Estimate all measures available. 
+Estimate all measures available, first using non-parametric estimation and then using semi-parametric estimates. 
 
 
 ```r
-# estimate accuracy measures using only the subcohort data
-survMTP.estimate(time = subCohortData2$survTime, event = subCohortData2$status, 
-    marker = subCohortData2$Y, weights = subCohortData2$weights2, cohortN = N, 
+# Non-parametric estimates
+survMTP.estimate(time = "survTime", event = "status", marker = "Y", weights = "weights2", 
+    subcohort.data = subCohortData2, cohort.data = SimData, cohort.size = N, 
+    estimation.method = "NP", study.design = "Case-Cohort", predict.time = 2, 
+    cutpoint = 0)
+```
+
+```
+## 
+##  Non-parametric estimates under Case-Cohort study design.
+## 
+##         estimate
+## AUC        0.694
+## TPR(c)     0.590
+## FPR(c)     0.377
+## PPV(c)     0.340
+## NPV(c)     0.822
+## 
+##  marker cutpoint: c = 0
+```
+
+```r
+
+# Semi-parametric estimates
+survMTP.estimate(time = "survTime", event = "status", marker = "Y", weights = "weights2", 
+    subcohort.data = subCohortData2, cohort.size = N, estimation.method = "SP", 
     study.design = "Case-Cohort", predict.time = 2, cutpoint = 0)
 ```
 
 ```
 ## 
-## Semi-parametric estimates under Case-Cohort study design.
+##  Semi-parametric estimates under Case-Cohort study design.
 ## 
-##         estimate     se      lower 0.95  upper 0.95
-## coef       0.908     0.123         0.666       1.150 
-## AUC        0.751     0.030         0.687       0.805 
-## TPR(c)     0.683     0.046         0.587       0.765 
-## FPR(c)     0.311     0.037         0.243       0.388 
-## PPV(c)     0.423     0.046         0.336       0.515 
-## NPV(c)     0.867     0.022         0.817       0.904 
+##         estimate
+## coef       0.908
+## AUC        0.751
+## TPR(c)     0.683
+## FPR(c)     0.311
+## PPV(c)     0.423
+## NPV(c)     0.867
 ## 
 ##  marker cutpoint: c = 0
 ```
 
 For more information see `?survMTP.estimate`. 
-
-### Validation of R package
-To validate the accuracy of estimates produced by the package, we ran several simulations under many different scenarios. Results for a single example, where <em>AUC = 0.75</em> is shown below. 1,000 cohort data sets were simulated from a proportional hazards model with sample size <em>n = 1,000</em> and <em>70%</em> censoring. Type I and II case cohort samples were collected from each simulated cohort and all summary measures were estimated. For the type I CCH design, a subcohort of size 300 was selected along with everyone with observed failure times (the mean sample size for this design was 510). For type II 250 cases and 250 controls were selected. Mean estimates for summary measures and SE are shown, which can be compared to the true measure values and the empirical SE, respectively.
-
-
-#### Type I 
-        | True Value | Mean(Est.) | Emp. SE | Mean(Est. SE)
---------|------------|----------|---------|-----------    
-     β  |  0.879  |  0.875  | 0.067 |      0.064
-    AUC |   0.750 |  0.747 | 0.016  |    0.015
- TPR(0) |   0.770 |  0.767 | 0.020  |    0.020
- FPR(0) |   0.420 |  0.420 | 0.018  |    0.017
- PPV(0) |   0.350 |  0.347 | 0.021  |    0.021
- NPV(0) |   0.900 |  0.895 | 0.011  |    0.011
-
-#### Type II
-        | True Value | Mean(Est.) | Emp. SE | Mean(Est. SE)
---------|------------|----------|---------|----------- 
-      β |   0.879 |   0.882  |0.083  |    0.082
-    AUC |   0.750 |   0.747  |0.019  |    0.019
- TPR(0) |   0.770 |   0.770  |0.025  |    0.024
- FPR(0) |   0.420 |   0.421  |0.026 |     0.026
- PPV(0) |   0.350 |   0.350  |0.024 |     0.024
- NPV(0) |   0.900 |   0.895  |0.012 |     0.012
 
 
 ### References
