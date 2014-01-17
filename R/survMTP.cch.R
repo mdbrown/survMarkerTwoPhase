@@ -1,35 +1,44 @@
  
-survMTP.estimate <- function(time, event, marker, weights, 
-                             subcohort.data,
-                             cohort.data = NULL, 
+survMTP.cch <- function(time, event, marker, weights, 
+                             subcoh,
+                             data, 
                              cohort.size, 
                              estimation.method = "NP", 
-                             study.design = "Case-Cohort", 
                              predict.time, 
-                             measures = c('all'), 
-                             cutpoint = median(marker)
+                             marker.cutpoint = 'median'
                            ){
-  cutoff <- cutpoint
+  
+  
+  # checks
+  stopifnot(is.data.frame(data))
+  
+  time <- eval(substitute(time), data)
+  event <- 1*eval(substitute(event), data)
+  marker <- eval(substitute(marker), data)
+  weights <- eval(substitute(weights), data)
+  vi <- 1*eval(substitute(subcoh), data)
+
+  stopifnot(is.element(estimation.method, c("NP", "SP")))
+  stopifnot(is.numeric(predict.time))
+  if(marker.cutpoint=='median') marker.cutpoint =  median(eval(substitute(marker), data))
+  stopifnot(is.numeric(marker.cutpoint))
+  
+  #set some defaults
+  measures = c('all')
+  cutoff <- marker.cutpoint
   cutoff.type = "none"; #cutoffN = 100 #functionality to be added later
   SEmethod ="normal"; #bootstraps = 10
-  CImethod = "logit.transformed"
+  CImethod = "standard"
   alpha=0.05
   
-  #put checks here
+
   if(length(cutoff)==0) cutoff = NA;  
   
   #data.frame checks
-  if(!is.data.frame(subcohort.data))
-    stop("subcohort.data must be a data.frame")
+  if(!is.data.frame(data))
+    stop("data must be a data.frame")
   
-  if(estimation.method=="NP" & is.null(cohort.data))
-    stop("cohort.data must be supplied when using estimation method NP")
-  
-  if(!is.null(cohort.data)){
-    if(!is.data.frame(cohort.data))
-       stop("cohort.data must be a data.frame")
-  }
-  
+  subcohort.data = data[vi==1,]
   
   #CImethod is either "standard" or "logit.transformed" 
   if(!is.element(substr(CImethod, 1,4), c("stan", "logi"))) stop("CImethod must be either 'standard' or 'logit.transformed'")
@@ -42,18 +51,17 @@ survMTP.estimate <- function(time, event, marker, weights,
   #make sure we have a cutoff if the measures call for it
   if(any(c("TPR", "FPR", "PPV", "NPV") %in% measures) & is.na(cutoff)) stop("'cutoff' must be set in order to calculate 'FPR', 'TPR', 'PPV, 'NPV'")
 
-  if(is.null(weights)){ 
-    stop("Must specify weights!")
-   # weights = rep(1, N)
-   # subcohort = FALSE
-  }else{
-    if(any(subcohort.data[,weights] <=0)) stop("weights must be > 0.")
+
+    if(any(weights[vi==1] <=0)) stop("weights must be > 0.")
     if(is.element(substr(SEmethod, 1,4), c("boot"))) stop("bootstrap SE's cannot be calculated when sample weights are provided, please set SEmethod='normal'")
     subcohort = TRUE
-  }
+  
+  
+  
+  
   
   #end of checks
-  
+  cohort.size = dim(data)[1]
   
   ## get estimates via getEstimates, also calculate the bootstrap se if necessary
   
@@ -62,10 +70,9 @@ survMTP.estimate <- function(time, event, marker, weights,
   
   if(is.element(estimation.method, c("S", "SP", "Semi-Parametric", "semiparametric"))){
 
-    mydata <- prepareDataSP(time, event, marker, weights, 
-                            subcohort.data)  
+    mydata <- prepareDataSP(time, event, marker, weights, vi)  
     estRawOutput <- getEstimatesSP( data = mydata, 
-                                      cutpoint = cutpoint,  
+                                      cutpoint = cutoff,  
                                       measures = measures,
                                       predict.time = predict.time,
                                       CalVar = FALSE,  
@@ -81,16 +88,14 @@ survMTP.estimate <- function(time, event, marker, weights,
     #myests$SEmethod = SEmethod;
     myests$predict.time = predict.time; 
     #myests$alpha = alpha; 
-    myests$study.design = study.design
+    myests$study.design = "Case-Cohort"
     myests$estimation.method = "Semi-parametric"
   }else if(is.element(estimation.method, c("N", "NP", "Non-Parametric", "nonparametric"))){
 
-    mydata <- prepareDataNP(time, event, marker, weights, 
-                            subcohort.data, 
-                            cohort.data)  
+    mydata <- prepareDataNP(time, event, marker, weights, vi)  
     estRawOutput <- getEstimatesNP( subcohort.data = mydata$subdata,
                                     cohort.data = mydata$cohortdata,
-                                      cutpoint = cutpoint,  
+                                      cutpoint = cutoff,  
                                       measures = measures,
                                       predict.time = predict.time,
                                       CalVar = FALSE,  
@@ -105,7 +110,7 @@ survMTP.estimate <- function(time, event, marker, weights,
     #myests$SEmethod = SEmethod;
     myests$predict.time = predict.time; 
     #myests$alpha = alpha; 
-    myests$study.design = study.design
+    myests$study.design = "Case-Cohort"
     myests$estimation.method = "Non-parametric"
   }else{
     
@@ -117,6 +122,6 @@ survMTP.estimate <- function(time, event, marker, weights,
 
   
   ## return the results in a nice fashion
-  class(myests) <-  "SurvMTP"
+  class(myests) <-  "SurvMTP_cch"
   myests
 }

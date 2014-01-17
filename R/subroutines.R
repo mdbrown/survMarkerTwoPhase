@@ -123,3 +123,19 @@ Est.Var.CCH.trueweights = function(N,Wexp,data,stratum, subcohort) {
 
 
 
+P0HAT.CCH.FUN<-function(cohortdata,type,ncch, ncch0,ncch1) {
+  
+  nn <- dim(cohortdata)[1]
+  di <- cohortdata$di
+  
+  if(type==1){ 
+    p0hat <- di+ (1- di)*ncch/nn
+  } else{
+    p0hat <- di*ncch1/sum(di) + (1-di)*ncch0/(nn-sum(di)) 
+  }
+  
+  p0hat
+}  
+
+
+
