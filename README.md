@@ -142,7 +142,7 @@ survMTP.cch(time = survTime, event = status, marker = Y, weights = weights,
 ## PPV(c)     0.386
 ## NPV(c)     0.909
 ## 
-##  marker cutpoint: c =
+##  marker cutpoint: c = 0
 ```
 
 
