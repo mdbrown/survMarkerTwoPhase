@@ -2,8 +2,7 @@
 survMTP.cch <- function(time, event, marker, weights, 
                              subcoh,
                              data, 
-                             cohort.size, 
-                             estimation.method = "NP", 
+                             estimation.method = 'NP', 
                              predict.time, 
                              marker.cutpoint = 'median'
                            ){
@@ -83,7 +82,7 @@ survMTP.cch <- function(time, event, marker, weights,
     names(myests$estimates) = c("coef", measures)
     #names(myests$se) = c("coef", measures)
     myests$model.fit <- estRawOutput$fit; 
-    myests$cutpoint = cutoff; 
+    myests$marker.cutpoint = cutoff; 
     #myests$CImethod = CImethod; 
     #myests$SEmethod = SEmethod;
     myests$predict.time = predict.time; 
@@ -105,7 +104,7 @@ survMTP.cch <- function(time, event, marker, weights,
     names(myests$estimates) = c( measures)
     #names(myests$se) = c("coef", measures)
     #myests$model.fit <- myests$fit; 
-    myests$cutpoint = cutoff; 
+    myests$marker.cutpoint = cutoff; 
     #myests$CImethod = CImethod; 
     #myests$SEmethod = SEmethod;
     myests$predict.time = predict.time; 

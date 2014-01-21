@@ -24,14 +24,6 @@ devtools::install_github("survMarkerTwoPhase", "mdbrown")
 
 ```r
 library(survMarkerTwoPhase)
-```
-
-```
-## Loading required package: survival
-## Loading required package: splines
-```
-
-```r
 
 # simulated data for illustration
 data(SimData)
@@ -97,6 +89,9 @@ cohortData_cch$weights <- 1/sampleProb
 
 # indicator of inclusion in the subcohort
 cohortData_cch$subcohort = sampleInd
+
+# marker data is unavailable for those not in the subcohort
+cohortData_cch$Y[sampleInd == 0] = NA
 ```
 
 Here we estimate using non-parametric estimation methods.   
@@ -104,7 +99,7 @@ Here we estimate using non-parametric estimation methods.
 
 ```r
 # estimate accuracy measures using non-parametric estimates by setting
-# ESTmethod = 'NP'
+# estimation.method = 'NP'
 survMTP.cch(time = survTime, event = status, marker = Y, weights = weights, 
     subcoh = subcohort, data = cohortData_cch, estimation.method = "NP", predict.time = 2, 
     marker.cutpoint = 0)
@@ -129,8 +124,7 @@ Now estimate measures  using semi-parametric estimation methods. These methods a
 
 
 ```r
-# estimate accuracy measures using semi-parametric estimates, we only need
-# the sub-cohort data here
+# estimate accuracy measures using semi-parametric estimates
 survMTP.cch(time = survTime, event = status, marker = Y, weights = weights, 
     subcoh = subcohort, data = cohortData_cch, estimation.method = "SP", predict.time = 2, 
     marker.cutpoint = 0)
@@ -148,7 +142,7 @@ survMTP.cch(time = survTime, event = status, marker = Y, weights = weights,
 ## PPV(c)     0.386
 ## NPV(c)     0.909
 ## 
-##  marker cutpoint: c = 0
+##  marker cutpoint: c =
 ```
 
 
@@ -163,19 +157,8 @@ Generate a nested case-control subcohort using the function `ccwc` from the [`Ep
 
 ```r
 require("Epi")
-```
 
-```
-## Loading required package: Epi
-## 
-## Attaching package: 'Epi'
-## 
-## The following object is masked from 'package:base':
-## 
-##     merge.data.frame
-```
-
-```r
+# 2 matched controls for each case
 nmatch = 2
 
 cohortData_ncc <- SimData
@@ -183,18 +166,6 @@ cohortData_ncc$id = 1:dim(cohortData_ncc)[1]
 
 subcohort_ncc <- ccwc(exit = survTime, fail = status, data = cohortData_ncc, 
     controls = nmatch)  # match 2 controls for each case. 
-```
-
-```
-## 
-## Sampling risk sets: ........................................................................................................................................................................................................
-```
-
-```
-## Warning: there were tied failure times
-```
-
-```r
 
 # indicator for inclusion in the subcohort
 sampleInd = rep(0, nrow(cohortData_ncc))  #initialize all equal to zero
@@ -203,15 +174,9 @@ sampleInd[subcohort_ncc$Map] = 1
 cohortData_ncc$subcohort = sampleInd
 
 table(sampleInd)  #subcohort sample size of 352
-```
 
-```
-## sampleInd
-##   0   1 
-## 148 352
-```
-
-```r
+# marker data is unavailable for those not in the subcohort
+cohortData_ncc$Y[sampleInd == 0] = NA
 
 # now we need to build the risk set matrix, which will be dimension (# of
 # cases) x (nmatch + 1), so 200x3 here each row denotes a risk set, with the

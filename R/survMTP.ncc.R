@@ -30,6 +30,40 @@ survMTP.ncc <- function(time,
   if(marker.cutpoint=='median') marker.cutpoint =  median(eval(substitute(marker), data))
   stopifnot(is.numeric(marker.cutpoint))
 
+  # remove missing data if time, event, id, subcohort is missing
+
+  completeIND <- complete.cases(time, event, vi, id)
+  
+  if(!all(completeIND)){ 
+
+    stop(paste('There are missing values in the 
+                   time, event, subcoh or id variables.
+                   Please remove these from "data" and re-run' ))
+  
+#  time  <- time[completeIND]
+#  event <- event[completeIND]
+#  vi <- vi[completeIND]
+#  id <- id[completeIND]
+#  marker <- marker[completeIND]
+  }
+  
+  #remove observations with missing marker value if it is in the subcohort
+  
+  completeIND_sub <- complete.cases(marker[vi==1])
+  
+  if(!all(completeIND_sub)){ 
+    
+    stop(paste('There are missing marker values in the subcohort. Please remove and re-run'))
+    #ids to remove
+   # rmID <- id[vi==1][!completeIND_sub]
+    
+   # time  <- time[!is.element(id, rmID)]
+  #  event <- event[!is.element(id, rmID)]
+  #  vi <- vi[!is.element(id, rmID)]
+  #  marker <- marker[!is.element(id, rmID)]
+  #  id <- id[!is.element(id, rmID)]
+  }
+  
   #\checks
   
   #build the data structures needed to call the necessary functions
@@ -83,7 +117,7 @@ survMTP.ncc <- function(time,
   myests <- processRawOutput(result, CImethod = "standard", alpha)
   myests$fit = NULL
   myests$model.fit <- result$fit; 
-  myests$cutpoint = marker.cutpoint; 
+  myests$marker.cutpoint = marker.cutpoint; 
   #myests$CImethod = CImethod; 
   #myests$SEmethod = SEmethod;
   myests$predict.time = predict.time; 

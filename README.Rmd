@@ -19,7 +19,7 @@ if (!require("devtools")) install.packages("devtools")
 devtools::install_github("survMarkerTwoPhase", "mdbrown")
 ```
 
-```{r}
+```{r, message = FALSE}
 library(survMarkerTwoPhase)
 
 #simulated data for illustration
@@ -64,13 +64,17 @@ sampleProb[cohortData_cch$status==0] <- 150/N
 cohortData_cch$weights <- 1/sampleProb
 
 #indicator of inclusion in the subcohort
-cohortData_cch$subcohort = sampleInd   
+cohortData_cch$subcohort = sampleInd  
+
+#marker data is unavailable for those not in the subcohort
+cohortData_cch$Y[sampleInd==0] = NA  
+
 ```
 Here we estimate using non-parametric estimation methods.   
 
 ```{r}
 #estimate accuracy measures using non-parametric estimates
-#by setting ESTmethod = "NP"
+#by setting estimation.method = "NP"
 survMTP.cch(time =survTime, 
             event = status, 
             marker = Y,
@@ -86,8 +90,7 @@ survMTP.cch(time =survTime,
 Now estimate measures  using semi-parametric estimation methods. These methods assume a Cox proportional hazards model.
 
 ```{r}
-#estimate accuracy measures using semi-parametric estimates, 
-# we only need the sub-cohort data here 
+#estimate accuracy measures using semi-parametric estimates
 survMTP.cch(time =survTime, 
             event = status, 
             marker = Y,
@@ -108,8 +111,10 @@ For a nested case-control sample, we need to input the full cohort data, with an
 
 Generate a nested case-control subcohort using the function `ccwc` from the [`Epi`](http://cran.r-project.org/web/packages/Epi/index.html) package. 
 
-```{r, result='hide'}
+```{r, results='hide', message=FALSE, warning=FALSE, tidy=TRUE}
 require('Epi')
+
+#2 matched controls for each case
 nmatch = 2
 
 cohortData_ncc <- SimData
@@ -124,6 +129,9 @@ sampleInd[subcohort_ncc$Map] = 1
 cohortData_ncc$subcohort = sampleInd  
 
 table(sampleInd) #subcohort sample size of 352
+
+#marker data is unavailable for those not in the subcohort
+cohortData_ncc$Y[sampleInd==0] = NA  
 
 #now we need to build the risk set matrix,
 #which will be dimension (# of cases) x (nmatch + 1), so 200x3 here

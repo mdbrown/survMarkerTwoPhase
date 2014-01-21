@@ -1,1 +1,1 @@
-exportPattern( "." )
+export(print.SurvMTP_cch, print.SurvMTP_ncc, survMTP.cch, survMTP.ncc)

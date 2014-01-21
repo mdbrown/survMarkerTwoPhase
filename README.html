@@ -197,13 +197,7 @@ devtools::install_github(&quot;survMarkerTwoPhase&quot;, &quot;mdbrown&quot;)
 </code></pre>
 
 <pre><code class="r">library(survMarkerTwoPhase)
-</code></pre>
 
-<pre><code>## Loading required package: survival
-## Loading required package: splines
-</code></pre>
-
-<pre><code class="r">
 # simulated data for illustration
 data(SimData)
 head(SimData)
@@ -260,12 +254,15 @@ cohortData_cch$weights &lt;- 1/sampleProb
 
 # indicator of inclusion in the subcohort
 cohortData_cch$subcohort = sampleInd
+
+# marker data is unavailable for those not in the subcohort
+cohortData_cch$Y[sampleInd == 0] = NA
 </code></pre>
 
 <p>Here we estimate using non-parametric estimation methods.   </p>
 
 <pre><code class="r"># estimate accuracy measures using non-parametric estimates by setting
-# ESTmethod = &#39;NP&#39;
+# estimation.method = &#39;NP&#39;
 survMTP.cch(time = survTime, event = status, marker = Y, weights = weights, 
     subcoh = subcohort, data = cohortData_cch, estimation.method = &quot;NP&quot;, predict.time = 2, 
     marker.cutpoint = 0)
@@ -286,8 +283,7 @@ survMTP.cch(time = survTime, event = status, marker = Y, weights = weights,
 
 <p>Now estimate measures  using semi-parametric estimation methods. These methods assume a Cox proportional hazards model.</p>
 
-<pre><code class="r"># estimate accuracy measures using semi-parametric estimates, we only need
-# the sub-cohort data here
+<pre><code class="r"># estimate accuracy measures using semi-parametric estimates
 survMTP.cch(time = survTime, event = status, marker = Y, weights = weights, 
     subcoh = subcohort, data = cohortData_cch, estimation.method = &quot;SP&quot;, predict.time = 2, 
     marker.cutpoint = 0)
@@ -304,7 +300,7 @@ survMTP.cch(time = survTime, event = status, marker = Y, weights = weights,
 ## PPV(c)     0.386
 ## NPV(c)     0.909
 ## 
-##  marker cutpoint: c = 0
+##  marker cutpoint: c =
 </code></pre>
 
 <p>For more information see <code>?survMTP.cch</code>. </p>
@@ -316,34 +312,16 @@ survMTP.cch(time = survTime, event = status, marker = Y, weights = weights,
 <p>Generate a nested case-control subcohort using the function <code>ccwc</code> from the <a href="http://cran.r-project.org/web/packages/Epi/index.html"><code>Epi</code></a> package. </p>
 
 <pre><code class="r">require(&quot;Epi&quot;)
-</code></pre>
 
-<pre><code>## Loading required package: Epi
-## 
-## Attaching package: &#39;Epi&#39;
-## 
-## The following object is masked from &#39;package:base&#39;:
-## 
-##     merge.data.frame
-</code></pre>
-
-<pre><code class="r">nmatch = 2
+# 2 matched controls for each case
+nmatch = 2
 
 cohortData_ncc &lt;- SimData
 cohortData_ncc$id = 1:dim(cohortData_ncc)[1]
 
 subcohort_ncc &lt;- ccwc(exit = survTime, fail = status, data = cohortData_ncc, 
     controls = nmatch)  # match 2 controls for each case. 
-</code></pre>
 
-<pre><code>## 
-## Sampling risk sets: ........................................................................................................................................................................................................
-</code></pre>
-
-<pre><code>## Warning: there were tied failure times
-</code></pre>
-
-<pre><code class="r">
 # indicator for inclusion in the subcohort
 sampleInd = rep(0, nrow(cohortData_ncc))  #initialize all equal to zero
 sampleInd[subcohort_ncc$Map] = 1
@@ -351,14 +329,10 @@ sampleInd[subcohort_ncc$Map] = 1
 cohortData_ncc$subcohort = sampleInd
 
 table(sampleInd)  #subcohort sample size of 352
-</code></pre>
 
-<pre><code>## sampleInd
-##   0   1 
-## 148 352
-</code></pre>
+# marker data is unavailable for those not in the subcohort
+cohortData_ncc$Y[sampleInd == 0] = NA
 
-<pre><code class="r">
 # now we need to build the risk set matrix, which will be dimension (# of
 # cases) x (nmatch + 1), so 200x3 here each row denotes a risk set, with the
 # case id followed by the matched control ids

@@ -43,7 +43,7 @@
   \item{model.fit}{*only returned if estimation.method = 'SP'* object of type
   'coxph' from fitting the model 
     \code{coxph(Surv(time, event)~Y)}}
-  \item{marker.cutoff, estimation.method, predict.time}{ function inputs}
+  \item{marker.cutpoint, estimation.method, predict.time}{ function inputs}
 }
 \description{
   This function estimates the AUC, TPR(c), FPR(c), PPV(c),

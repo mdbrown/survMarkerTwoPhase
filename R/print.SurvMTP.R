@@ -43,7 +43,7 @@ print.SurvMTP_cch <- function(x, ...){
   
   cat("\n")
   
-if(any(mynames %in% c("FPR(c)", "TPR(c)" , "NPV(c)" , "PPV(c)"))) cat(" marker cutpoint: c =", x$cutpoint, "\n")
+if(any(mynames %in% c("FPR(c)", "TPR(c)" , "NPV(c)" , "PPV(c)"))) cat(" marker cutpoint: c =", x$marker.cutpoint, "\n")
 cat("\n")
   
   
@@ -90,7 +90,7 @@ print.SurvMTP_ncc <- function(x, ...){
   
   cat("\n")
   
-  if(any(mynames %in% c("FPR(c)", "TPR(c)" , "NPV(c)" , "PPV(c)"))) cat(" marker cutpoint: c =", round(x$cutpoint,3), "\n")
+  if(any(mynames %in% c("FPR(c)", "TPR(c)" , "NPV(c)" , "PPV(c)"))) cat(" marker cutpoint: c =", round(x$marker.cutpoint,3), "\n")
   cat("\n")
   
   
