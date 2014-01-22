@@ -1,3 +1,5 @@
+library(survMarkerTwoPhase)
+
 source("simulateData.R")
 Nsim = 1000
 ## semi parametric
