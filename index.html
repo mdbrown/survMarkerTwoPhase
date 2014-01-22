@@ -5,71 +5,40 @@
     <meta charset='utf-8' />
     <meta http-equiv="X-UA-Compatible" content="chrome=1" />
     <meta name="description" content="survMarkerTwoPhase : Evaluate the prognostic accuracy of a marker under two phase designs." />
-   <link href="css/bootstrap.css" rel="stylesheet">
-    <link href="css/bootstrap-responsive.css" rel="stylesheet">
+
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
     <title>survMarkerTwoPhase</title>
   </head>
 
   <body>
-  <div class="navbar navbar-inverse pull-right">
-      <div class="navbar-inner">
-        <div class="container">
-          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          
-          <div class="nav-collapse collapse">
-            <ul class="nav pull-right">
-
-              <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Prognostic Biomarker Validation <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                  <li><a href="http://mdbrown.github.io/survRpackages/">Home</a></li>
-                  <li class="nav-header">R packages</li>
-                  <li><a href="http://mdbrown.github.io/survAccuracyMeasures/">survAccuracyMeasures</a></li>
-                  <li><a href="http://mdbrown.github.io/survMarkerTwoPhase/">survMarkerTwoPhase</a></li>
-                  <li><a href="http://mdbrown.github.io/survCompetingRisk/">survCompetingRisk</a></li>
-                  <li><a href="http://mdbrown.github.io/survNRI/">survNRI</a></li>
-                  <li class="nav-header">Power simulations</li>
-                  <li><a href="http://glimmer.rstudio.com/mdbrown/PowerSAM/">Cohort</a></li>
-                  <li><a href="http://glimmer.rstudio.com/mdbrown/PowerSAM_cch/">Case-Cohort</a></li>
-                  <li><a href="http://glimmer.rstudio.com/mdbrown/PowerSAM_ncc/"> Nested Case-control</a></li>
-                </ul>
-              </li>
-            </ul>
-
-          </div><!--/.nav-collapse -->
-        </div>
-      </div>
-    </div>
-
 
     <!-- HEADER -->
     <div id="header_wrap" class="outer">
         <header class="inner">
+          <a id="forkme_banner" href="https://github.com/mdbrown/survMarkerTwoPhase">View on GitHub</a>
 
           <h1 id="project_title">survMarkerTwoPhase</h1>
           <h2 id="project_tagline">Evaluate the prognostic accuracy of a marker under two phase designs.</h2>
 
-           <a id="forkme_banner" href="https://github.com/mdbrown/survMarkerTwoPhase">View on GitHub</a>
-
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/mdbrown/survMarkerTwoPhase/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/mdbrown/survMarkerTwoPhase/tarball/master">Download this project as a tar.gz file</a>
+            </section>
         </header>
     </div>
-
-
 
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <p>This R package computes non-parametric and semi-parametric estimates of accuracy measures for risk prediction markers from survival data under two phase designs. For now, estimates can be obtained for the the case-cohort study design. Calculations for the nested case-control design will be implemented soon. </p>
+        <p>This R package computes non-parametric and semi-parametric estimates of accuracy measures for risk prediction markers from survival data under two phase study designs, namely the case-cohort (cch) and the nested case-control (ncc) study designs. Semi-parametric estimates assume a cox proportional hazards model, while non-parametric calculations use kernel based smoothing to obtain estimates.  </p>
 
-<p>Once sample weights are obtained, the function <code>survMTP.estimate</code> estimates the <strong>AUC</strong>, <strong>TPR(c)</strong>, <strong>FPR(c)</strong>, <strong>PPV(c)</strong>, and <strong>NPV(c)</strong> for for a specific timepoint and marker cutoff value c.</p>
+<p>The accuracy measures that can be estimated include the <strong>AUC</strong>, <strong>TPR(c)</strong>, <strong>FPR(c)</strong>, <strong>PPV(c)</strong>, and <strong>NPV(c)</strong> for for a specific timepoint and fixed marker cutoff value c. Standard errors, along with normal approximated confidence intervals can be calculated under the ncc design, but are unavailable for the cch design as of now. Standard errors are calculated using perturbation methods. </p>
 
-<p>For more information, see references below. </p>
+<p>Below is a brief tutorial to get you started. For more information regarding estimation procedures see the references below. </p>
+
+<h2>
+<a name="tutorial" class="anchor" href="#tutorial"><span class="octicon octicon-link"></span></a>Tutorial</h2>
 
 <h3>
 <a name="download-and-install-the-package" class="anchor" href="#download-and-install-the-package"><span class="octicon octicon-link"></span></a>Download and install the package</h3>
@@ -80,15 +49,7 @@
 </pre></div>
 
 <div class="highlight highlight-r"><pre><span class="c">library(survMarkerTwoPhase)</span>
-</pre></div>
 
-<pre><code>## Loading required package: survival
-</code></pre>
-
-<pre><code>## Loading required package: splines
-</code></pre>
-
-<div class="highlight highlight-r"><pre>
 <span class="c"># simulated data for illustration</span>
 <span class="c">data(SimData)</span>
 <span class="c">head(SimData)</span>
@@ -104,14 +65,9 @@
 </code></pre>
 
 <h3>
-<a name="case-cohort-design" class="anchor" href="#case-cohort-design"><span class="octicon octicon-link"></span></a>Case-Cohort Design</h3>
+<a name="case-cohort-design" class="anchor" href="#case-cohort-design"><span class="octicon octicon-link"></span></a>Case-cohort design</h3>
 
-<p>Estimation using a case-cohort subcohort design is permitted. Sample weights must first be calculated.</p>
-
-<h4>
-<a name="type-i" class="anchor" href="#type-i"><span class="octicon octicon-link"></span></a>Type I:</h4>
-
-<p>Sample <strong>n=150</strong> from entire cohort, and include all participants with observed failures. </p>
+<p>For the case-cohort design we sample <strong>n=150</strong> from entire cohort, and include all participants with observed failures. </p>
 
 <div class="highlight highlight-r"><pre><span class="c"># generate a sub-cohort from SimData</span>
 <span class="c">set.seed(12321)</span>
@@ -122,8 +78,7 @@
 <span class="c"># sample all with observed failure time. (200 individuals)</span>
 <span class="c">sampleInd[SimData$status == 1] &lt;- 1</span>
 
-<span class="c"># sample 150 more observations from the entire data set without</span>
-<span class="c"># replacement</span>
+<span class="c"># sample 150 more observations from the entire data set without replacement</span>
 <span class="c">sampleInd[sample(1:N, 150)] &lt;- 1</span>
 
 <span class="c">table(sampleInd)  #total number of subcohort is 293 </span>
@@ -134,31 +89,36 @@
 ## 207 293
 </code></pre>
 
-<p>Now we calculate the sample weights <em>w = 1/Pr(Sampled from cohort)</em> for each observation included in the sub-cohort. </p>
+<p>To estimate accuracy measures for the case-cohort design, sample weights must be calculated. The sample weights <em>w = 1/Pr(Sampled from cohort)</em> for each observation included in the sub-cohort. </p>
 
-<div class="highlight highlight-r"><pre><span class="c"># first calculate the Pr(Sampled from cohort) for each observation</span>
+<div class="highlight highlight-r"><pre><span class="c">cohortData_cch &lt;- SimData</span>
+
+<span class="c"># first calculate the Pr(Sampled from cohort) for each observation</span>
 <span class="c">sampleProb &lt;- numeric(500)</span>
 
-<span class="c"># all non-censored observations were sampled, so their sample probability</span>
-<span class="c"># is 1</span>
-<span class="c">sampleProb[SimData$status == 1] &lt;- 1</span>
+<span class="c"># all non-censored observations were sampled, so their sample probability is</span>
+<span class="c"># 1</span>
+<span class="c">sampleProb[cohortData_cch$status == 1] &lt;- 1</span>
 <span class="c"># all other individuals had a 150/N chance to be sampled</span>
-<span class="c">sampleProb[SimData$status == 0] &lt;- 150/N</span>
+<span class="c">sampleProb[cohortData_cch$status == 0] &lt;- 150/N</span>
 
 <span class="c"># the sample weights are 1/(probability of being sampled)</span>
-<span class="c">SimData$weights &lt;- 1/sampleProb</span>
+<span class="c">cohortData_cch$weights &lt;- 1/sampleProb</span>
 
-<span class="c">subCohortData &lt;- SimData[sampleInd == 1, ]</span>
+<span class="c"># indicator of inclusion in the subcohort</span>
+<span class="c">cohortData_cch$subcohort = sampleInd</span>
+
+<span class="c"># marker data is unavailable for those not in the subcohort</span>
+<span class="c">cohortData_cch$Y[sampleInd == 0] = NA</span>
 </pre></div>
 
-<p>Here we estimate all measures available using non-parametric estimation methods. For non-parametric estimation, we need to provide the subcohort data consisting of status, survival time, marker, and weight, as well as survival time and status for the full cohort.   </p>
+<p>Here we estimate using non-parametric estimation methods.   </p>
 
 <div class="highlight highlight-r"><pre><span class="c"># estimate accuracy measures using non-parametric estimates by setting</span>
-<span class="c"># ESTmethod = 'NP' we have to supply subcohort data and full cohort data</span>
-<span class="c">survMTP.estimate(time = "survTime", event = "status", marker = "Y", weights = "weights", </span>
-<span class="c">    subcohort.data = subCohortData, cohort.data = SimData, cohort.size = N, </span>
-<span class="c">    estimation.method = "NP", study.design = "Case-Cohort", predict.time = 2, </span>
-<span class="c">    cutpoint = 0)</span>
+<span class="c"># estimation.method = 'NP'</span>
+<span class="c">survMTP.cch(time = survTime, event = status, marker = Y, weights = weights, </span>
+<span class="c">    subcoh = subcohort, data = cohortData_cch, estimation.method = "NP", predict.time = 2, </span>
+<span class="c">    marker.cutpoint = 0)</span>
 </pre></div>
 
 <pre><code>## 
@@ -174,13 +134,12 @@
 ##  marker cutpoint: c = 0
 </code></pre>
 
-<p>Now estimate all measures  using semi-parametric estimation methods. These methods assume a Cox proportional hazards model. We only have to provide subcohort data in this case. </p>
+<p>Now estimate measures  using semi-parametric estimation methods. These methods assume a Cox proportional hazards model.</p>
 
-<div class="highlight highlight-r"><pre><span class="c"># estimate accuracy measures using semi-parametric estimates, we only need</span>
-<span class="c"># the sub-cohort data here</span>
-<span class="c">survMTP.estimate(time = "survTime", event = "status", marker = "Y", weights = "weights", </span>
-<span class="c">    subcohort.data = subCohortData, cohort.size = N, estimation.method = "SP", </span>
-<span class="c">    study.design = "Case-Cohort", predict.time = 2, cutpoint = 0)</span>
+<div class="highlight highlight-r"><pre><span class="c"># estimate accuracy measures using semi-parametric estimates</span>
+<span class="c">survMTP.cch(time = survTime, event = status, marker = Y, weights = weights, </span>
+<span class="c">    subcoh = subcohort, data = cohortData_cch, estimation.method = "SP", predict.time = 2, </span>
+<span class="c">    marker.cutpoint = 0)</span>
 </pre></div>
 
 <pre><code>## 
@@ -197,125 +156,102 @@
 ##  marker cutpoint: c = 0
 </code></pre>
 
-<p>Only estimate the <strong>AUC</strong> and <strong>TPR(0)</strong>. </p>
+<p>For more information see <code>?survMTP.cch</code>. </p>
 
-<div class="highlight highlight-r"><pre><span class="c">tmp &lt;- survMTP.estimate(time = "survTime", event = "status", marker = "Y", weights = "weights", </span>
-<span class="c">    subcohort.data = subCohortData, cohort.size = N, study.design = "Case-Cohort", </span>
-<span class="c">    estimation.method = "SP", predict.time = 2, measures = c("AUC", "TPR"), </span>
-<span class="c">    cutpoint = 0)</span>
-<span class="c">tmp</span>
+<h3>
+<a name="nested-case-control" class="anchor" href="#nested-case-control"><span class="octicon octicon-link"></span></a>Nested case-control</h3>
+
+<p>For a nested case-control sample, we need to input the full cohort data, with an indicator for inclusion in the subcohort, as well as a dataframe of risk sets, where each row is a case id followed by the corresponding id's that were matched to it. </p>
+
+<p>Generate a nested case-control subcohort using the function <code>ccwc</code> from the <a href="http://cran.r-project.org/web/packages/Epi/index.html"><code>Epi</code></a> package. </p>
+
+<div class="highlight highlight-r"><pre><span class="c">require("Epi")</span>
+
+<span class="c"># 2 matched controls for each case</span>
+<span class="c">nmatch = 2</span>
+
+<span class="c">cohortData_ncc &lt;- SimData</span>
+<span class="c">cohortData_ncc$id = 1:dim(cohortData_ncc)[1]</span>
+
+<span class="c">subcohort_ncc &lt;- ccwc(exit = survTime, fail = status, data = cohortData_ncc, </span>
+<span class="c">    controls = nmatch)  # match 2 controls for each case. </span>
+
+<span class="c"># indicator for inclusion in the subcohort</span>
+<span class="c">sampleInd = rep(0, nrow(cohortData_ncc))  #initialize all equal to zero</span>
+<span class="c">sampleInd[subcohort_ncc$Map] = 1</span>
+
+<span class="c">cohortData_ncc$subcohort = sampleInd</span>
+
+<span class="c">table(sampleInd)  #subcohort sample size of 352</span>
+
+<span class="c"># marker data is unavailable for those not in the subcohort</span>
+<span class="c">cohortData_ncc$Y[sampleInd == 0] = NA</span>
+
+<span class="c"># now we need to build the risk set matrix, which will be dimension (# of</span>
+<span class="c"># cases) x (nmatch + 1), so 200x3 here each row denotes a risk set, with the</span>
+<span class="c"># case id followed by the matched control ids</span>
+<span class="c">RiskSets &lt;- matrix(nrow = sum(cohortData_ncc$status), ncol = nmatch + 1)</span>
+
+<span class="c">for (i in subcohort_ncc$Set) {</span>
+<span class="c">    RiskSets[i, ] &lt;- unlist(subset(subcohort_ncc, Set == i, select = Map))</span>
+<span class="c">}</span>
+</pre></div>
+
+<p>Now we are ready to calculate the measures using <code>survMTP.ncc</code>. </p>
+
+<div class="highlight highlight-r"><pre><span class="c"># Nonparametric estimates</span>
+<span class="c">survMTP.ncc(time = survTime, event = status, marker = Y, subcoh = subcohort, </span>
+<span class="c">    id = id, data = cohortData_ncc, risk.sets = RiskSets, estimation.method = "NP", </span>
+<span class="c">    predict.time = 2, marker.cutpoint = 0)</span>
 </pre></div>
 
 <pre><code>## 
-##  Semi-parametric estimates under Case-Cohort study design.
+##  Non-parametric estimates under Nested Case-Control study design.
 ## 
-##         estimate
-## coef       1.088
-## AUC        0.788
-## TPR(c)     0.770
+##         estimate     se      lower 0.95  upper 0.95
+## 
+## AUC        0.742     0.027         0.690       0.795 
+## FPR(c)     0.379     0.032         0.316       0.443 
+## TPR(c)     0.684     0.044         0.598       0.770 
+## NPV(c)     0.875     0.020         0.837       0.914 
+## PPV(c)     0.335     0.033         0.270       0.401 
 ## 
 ##  marker cutpoint: c = 0
 </code></pre>
 
-<div class="highlight highlight-r"><pre><span class="c"># access the estimates</span>
-<span class="c">tmp$estimates</span>
-</pre></div>
-
-<pre><code>##    coef    AUC    TPR
-## 1 1.088 0.7876 0.7705
-</code></pre>
-
-<h4>
-<a name="type-ii" class="anchor" href="#type-ii"><span class="octicon octicon-link"></span></a>Type II:</h4>
-
-<p>In the second sampling design, we sample <strong>n=100</strong> from the strata of participants with observed failures and <strong>n=100</strong> from censored individuals. We need to account for this when we calculate the sampling weights. </p>
-
-<div class="highlight highlight-r"><pre><span class="c"># create a new sample index. 1 if sampled, 0 if not</span>
-<span class="c">sampleInd &lt;- rep(0, N)</span>
-
-<span class="c"># sample 100 individuals with observed failure time.</span>
-<span class="c">CaseInd &lt;- c(1:N)[SimData$status == 1]</span>
-<span class="c">sampleInd[sample(CaseInd, 100)] &lt;- 1</span>
-
-<span class="c"># sample 100 individuals with censored failure time.</span>
-<span class="c">ControlInd &lt;- c(1:N)[SimData$status == 0]</span>
-<span class="c">sampleInd[sample(ControlInd, 100)] &lt;- 1</span>
-
-<span class="c">table(sampleInd)  #total number of subcohort is 200 </span>
-</pre></div>
-
-<pre><code>## sampleInd
-##   0   1 
-## 300 200
-</code></pre>
-
-<p>Calculate the sample weights.</p>
-
-<div class="highlight highlight-r"><pre><span class="c"># first calculate the Pr(Sampled from cohort) for each observation</span>
-<span class="c">sampleProb &lt;- numeric(500)</span>
-
-<span class="c"># all non-censored observations were sampled</span>
-<span class="c">sampleProb[SimData$status == 1] &lt;- 100/length(CaseInd)</span>
-<span class="c">sampleProb[SimData$status == 0] &lt;- 100/length(ControlInd)</span>
-
-<span class="c">SimData$weights2 &lt;- 1/sampleProb</span>
-
-<span class="c">subCohortData2 &lt;- SimData[sampleInd == 1, ]</span>
-</pre></div>
-
-<p>Estimate all measures available, first using non-parametric estimation and then using semi-parametric estimates. </p>
-
-<div class="highlight highlight-r"><pre><span class="c"># Non-parametric estimates</span>
-<span class="c">survMTP.estimate(time = "survTime", event = "status", marker = "Y", weights = "weights2", </span>
-<span class="c">    subcohort.data = subCohortData2, cohort.data = SimData, cohort.size = N, </span>
-<span class="c">    estimation.method = "NP", study.design = "Case-Cohort", predict.time = 2, </span>
-<span class="c">    cutpoint = 0)</span>
+<div class="highlight highlight-r"><pre><span class="c"># Semiparametric estimates</span>
+<span class="c">survMTP.ncc(time = survTime, event = status, marker = Y, subcoh = subcohort, </span>
+<span class="c">    id = id, data = cohortData_ncc, risk.sets = RiskSets, estimation.method = "SP", </span>
+<span class="c">    predict.time = 2, marker.cutpoint = 0)</span>
 </pre></div>
 
 <pre><code>## 
-##  Non-parametric estimates under Case-Cohort study design.
+##  Semi-parametric estimates under Nested Case-Control study design.
 ## 
-##         estimate
-## AUC        0.694
-## TPR(c)     0.590
-## FPR(c)     0.377
-## PPV(c)     0.340
-## NPV(c)     0.822
+##         estimate     se      lower 0.95  upper 0.95
+## 
+## coef       1.017     0.082         0.857       1.177 
+## AUC        0.777     0.020         0.738       0.815 
+## FPR(c)     0.356     0.030         0.297       0.416 
+## TPR(c)     0.755     0.030         0.696       0.813 
+## NPV(c)     0.900     0.013         0.875       0.926 
+## PPV(c)     0.381     0.032         0.319       0.443 
 ## 
 ##  marker cutpoint: c = 0
 </code></pre>
 
-<div class="highlight highlight-r"><pre>
-<span class="c"># Semi-parametric estimates</span>
-<span class="c">survMTP.estimate(time = "survTime", event = "status", marker = "Y", weights = "weights2", </span>
-<span class="c">    subcohort.data = subCohortData2, cohort.size = N, estimation.method = "SP", </span>
-<span class="c">    study.design = "Case-Cohort", predict.time = 2, cutpoint = 0)</span>
-</pre></div>
-
-<pre><code>## 
-##  Semi-parametric estimates under Case-Cohort study design.
-## 
-##         estimate
-## coef       0.908
-## AUC        0.751
-## TPR(c)     0.683
-## FPR(c)     0.311
-## PPV(c)     0.423
-## NPV(c)     0.867
-## 
-##  marker cutpoint: c = 0
-</code></pre>
-
-<p>For more information see <code>?survMTP.estimate</code>. </p>
+<p>See <code>?survMTP.ncc</code> for further help. </p>
 
 <h3>
 <a name="references" class="anchor" href="#references"><span class="octicon octicon-link"></span></a>References</h3>
 
-<p>Liu D, Cai T, Zheng Y. Evaluating the predictive value of biomarkers with stratified case-cohort design. <em>Biometrics</em> 2012, 4: 1219-1227.</p>
-
-<p>Pepe MS, Zheng Y, Jin Y. Evaluating the ROC performance of markers for future events. <em>Lifetime Data Analysis.</em> 2008, 14: 86-113.</p>
-
-<p>Zheng Y, Cai T, Pepe MS, Levy, W. Time-dependent predictive values of prognostic biomarkers with failure time outcome. <em>JASA</em> 2008, 103: 362-368.</p>
+<ol>
+<li><p>Liu D, Cai T, Zheng Y. Evaluating the predictive value of biomarkers with stratified case-cohort design. <em>Biometrics</em> 2012, 4: 1219-1227.</p></li>
+<li><p>Pepe MS, Zheng Y, Jin Y. Evaluating the ROC performance of markers for future events. <em>Lifetime Data Analysis.</em> 2008, 14: 86-113.</p></li>
+<li><p>Zheng Y, Cai T, Pepe MS, Levy, W. Time-dependent predictive values of prognostic biomarkers with failure time outcome. <em>JASA</em> 2008, 103: 362-368.</p></li>
+<li><p>Cai T. and Zheng Y . Resampling Procedures for Making Inference under Nested Case-control Studies. <em>JASA</em> 2013 (in press). </p></li>
+<li><p>Cai T and Zheng Y/<em>, Evaluating Prognostic Accuracy of Biomarkers under nested case-control studies. *Biostatistics</em> 2012, 13,1, 89-100. </p></li>
+</ol><p>(* equal contributor and corresponding author). </p>
       </section>
     </div>
 
@@ -327,8 +263,7 @@
       </footer>
     </div>
 
-    <script src="http://code.jquery.com/jquery.js"></script>
-    <script src="js/bootstrap.min.js"></script>
+    
 
   </body>
 </html>
