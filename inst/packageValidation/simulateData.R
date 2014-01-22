@@ -1,4 +1,87 @@
 
+
+#function to run a single simulation 
+
+run_one_sim <- function(sample.design, 
+                        estimation.method,
+                        N = 1000,
+                        beta = log(3), 
+                        lam0 = 0.1, 
+                        cens.perc = 0.8, 
+                        ncch = 150, #for cch
+                        m.match = 2, #for ncc
+                        predict.time = 2, 
+                        marker.cutpoint = 0){
+  
+  
+  ##cch 
+  if(sample.design=="cch"){
+    
+    #simulate data
+    sData <- simulateData.cohort(nn = N, beta = beta, lam0 = lam0, cens.perc = cens.perc)
+    sData <- simulateData.cch(sData, type = 1, ncch= 250) # draw the subsample
+    
+    #sample weights
+    phat <- P0HAT.CCH.FUN(sData, type = 1, ncch=250)
+    sData$weights <- 1/phat
+    #get estimates
+    ests <- survMTP.cch( time = xi, 
+                         event = di, 
+                         marker = Y, 
+                         weights=weights, 
+                         subcoh = vi, 
+                         data = sData, 
+                         estimation.method = estimation.method, 
+                         predict.time = predict.time,
+                         marker.cutpoint = marker.cutpoint)
+    ests <- ests$estimates
+    
+  }else if(sample.design == "ncc"){
+    
+    #simulate data, this function returns a list with three elements
+    sData <- simulateData.ncc(nn = N, beta = beta, lam0 = lam0, 
+                              cens.perc = cens.perc, 
+                              m.match = m.match, 
+                              time.max = NULL)
+    
+    #build risk sets
+    risk.sets <- sData[[2]]
+    risk.sets <- risk.sets[,-c(1:2)] #throw away the first two columns
+    
+    #cohort data with subsample indicated by vi
+    sData <- data.frame(sData[[1]])
+    sData$id <- 1:N
+    
+    ests <- survMTP.ncc(time = xi, event=di, marker = yi, 
+                        subcoh = vi, id = id, 
+                        data = sData, 
+                        risk.sets = risk.sets,
+                        estimation.method = estimation.method, 
+                        predict.time = predict.time, 
+                        marker.cutpoint = marker.cutpoint)
+    
+    ests$model.fit <- NULL #dont want to save this info..too much!
+    
+  }else if(sample.design == "cohort"){
+    stop("dont do this yet")
+  }else{
+    stop("sample.design not set correctly")
+  }
+  
+  print(proc.time())
+  return(ests)
+  
+}
+
+
+
+
+
+
+
+
+######### marker simulation functions
+
 simulateData.ncc <- function(nn=5000, 
                                   beta = beta.Ha, 
                                   lam0 = a, 
@@ -75,7 +158,7 @@ simulateData.ncc <- function(nn=5000,
 
 
 
-SIM.data.singleMarker <- 
+simulateData.cohort <- 
   function(nn,
            mu = 0, 
            Sigma = 1, 
@@ -126,14 +209,15 @@ SIM.data.singleMarker <-
   }
 
 
+
+###
+### cch
+###
+
 ## type = 1: sample all case, and a random sample from the full cohort 
 ## type = 2: sample without replacement among di=0 and di=1  
 
-###
-### No Matching 
-###
-
-SIM.CCH.FUN <- function(data0, ncch  = NULL,
+simulateData.cch <- function(data0, ncch  = NULL,
                         ncch0 = NULL,
                         ncch1 = NULL,
                         type = 2)
