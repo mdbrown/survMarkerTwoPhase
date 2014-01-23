@@ -65,17 +65,19 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
 	
-	<section class="innerLeft">
+<!--	<section class="innerLeft">
 	<ul>
-	<li><a href="#tutorial">Tutorial</a> </li>
-	<li>Harry S. Truman</li>
-	<li>John F. Kennedy</li>
-	<li>Lyndon B. Johnson</li>
-	<li>Jimmy Carter</li>
-	<li>Bill Clinton</li>
+	<li><a href="#tutorial">Tutorial</a>
+        <ul>
+            <li><a href="#cch">Case-cohort</a></li>
+            <li><a href="#ncc">Nested case-control</a></li>
+        </ul>
+        </li>
+	<li><a href="#validation">Package validation</a></li>
+
 	</ul>
 	</section>
-	
+	-->
       <section id="main_content" class="inner">
         <p>This R package computes non-parametric and semi-parametric estimates of accuracy measures for risk prediction markers from survival data under two phase study designs, namely the case-cohort (cch) and the nested case-control (ncc) study designs. Semi-parametric estimates assume a cox proportional hazards model, while non-parametric calculations use kernel based smoothing to obtain estimates.  </p>
 
@@ -111,7 +113,7 @@
 </code></pre>
 
 <h3>
-<a name="case-cohort-design" class="anchor" href="#case-cohort-design"><span class="octicon octicon-link"></span></a>Case-cohort design</h3>
+<a name="case-cohort-design" class="anchor" href="#case-cohort-design"><span class="octicon octicon-link"></span></a><a id="cch">Case-cohort design</a></h3>
 
 <p>For the case-cohort design we sample <strong>n=150</strong> from entire cohort, and include all participants with observed failures. </p>
 
@@ -205,7 +207,7 @@
 <p>For more information see <code>?survMTP.cch</code>. </p>
 
 <h3>
-<a name="nested-case-control" class="anchor" href="#nested-case-control"><span class="octicon octicon-link"></span></a>Nested case-control</h3>
+<a name="nested-case-control" class="anchor" href="#nested-case-control"><span class="octicon octicon-link"></span></a><a id="ncc">Nested case-control</a></h3>
 
 <p>For a nested case-control sample, we need to input the full cohort data, with an indicator for inclusion in the subcohort, as well as a dataframe of risk sets, where each row is a case id followed by the corresponding id's that were matched to it. </p>
 
