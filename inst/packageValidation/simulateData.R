@@ -4,6 +4,7 @@
 
 run_one_sim <- function(sample.design, 
                         estimation.method,
+                        counter, 
                         N = 1000,
                         beta = log(3), 
                         lam0 = 0.1, 
@@ -68,7 +69,7 @@ run_one_sim <- function(sample.design,
     stop("sample.design not set correctly")
   }
   
-  print(proc.time())
+  print(counter())
   return(ests)
   
 }
