@@ -83,7 +83,7 @@
 
 <p>The accuracy measures that can be estimated include the <strong>AUC</strong>, <strong>TPR(c)</strong>, <strong>FPR(c)</strong>, <strong>PPV(c)</strong>, and <strong>NPV(c)</strong> for for a specific timepoint and fixed marker cutoff value c. Standard errors, along with normal approximated confidence intervals can be calculated under the ncc design, but are unavailable for the cch design as of now. Standard errors are calculated using perturbation methods. </p>
 
-<p>Below is a brief tutorial to get you started. For more information regarding estimation procedures see the references below. </p>
+<p>Below is a brief <a href = "#tutorial">tutorial</a> to get you started. Results from a small simulation to serve as <a href = "#validation">package validation</a> are then shown. For more information regarding estimation procedures see the <a href = "#references">references</a> below. </p>
 
 <h2>
 <a name="tutorial" class="anchor" href="#tutorial"><span class="octicon octicon-link"></span></a><a id="tutorial">Tutorial</a></h2>
@@ -291,7 +291,29 @@
 <p>See <code>?survMTP.ncc</code> for further help. </p>
 
 <h3>
-<a name="references" class="anchor" href="#references"><span class="octicon octicon-link"></span></a>References</h3>
+<a name="validation" class="anchor" href="#validation"><span class="octicon octicon-link"></span></a><a id="validation">Package Validation</a></h3>
+
+
+<p>To validate the package procedures, a small simulation (1,000 replicates) was run. For each replicate, time-to-event cohort data was simulated with 80% censoring and sample size <em>n=1,000</em>. CCH and NCC sub samples were chosen and accuracy measures where estimated. </p>
+<h4>Case-cohort</h4>
+
+<img alt="Sampling distribution of estimates under CCH design" src="img/cch_validation.png"> 
+<em>Non-parametric and semi-parametric estimates under the CCH design. True measure value indicated by the purple vertical lines.</em>
+
+
+<h4>Nested case-control</h4>
+<p>For nested case-control designs, standard errors where also estimated. To validate these estimates, we compare the sampling distribution of SE estimates to the empirical standard error across simulations of accuracy measure estimates.</p>
+
+<img alt="Sampling distribution of estimates under NCC design" src="img/ncc_validation.png"> 
+<em>Non-parametric and semi-parametric estimates of accuracy measures under the NCC design. True measure value indicated by the purple vertical lines.</em>
+
+<img alt="Sampling distribution of estimates under NCC design" src="img/ncc_validation_SE.png"> 
+<em>Non-parametric and semi-parametric estimates of standard error under the NCC design. Empirical standard error indicated by the purple vertical dash-lines.</em>
+
+
+
+<h3>
+<a name="references" class="anchor" href="#references"><span class="octicon octicon-link"></span></a><a id="references">References</a></h3>
 
 <ol>
 <li><p>Liu D, Cai T, Zheng Y. Evaluating the predictive value of biomarkers with stratified case-cohort design. <em>Biometrics</em> 2012, 4: 1219-1227.</p></li>
