@@ -168,18 +168,24 @@ nccData[,7] <- factor(rep(c("semiparametric", "nonparametric"), c(1000, 1000)))
 
 nccData.long <- melt(nccData)
 
-cbind( ddply(nccData.long, .(variable, method), summarize, meanSE = mean(value)), EmpiricalSE.long$se)
+seData <- cbind( ddply(nccData.long, .(variable, method), summarize, meanSE = mean(value)), true = EmpiricalSE.long$se)
 
 
 p <- ggplot(nccData.long, aes(x=value, fill = method))
 p <- p + geom_density(alpha = 1) + facet_grid(method~variable, scales="free_x")
 
-p <- p + geom_vline(data = EmpiricalSE.long, aes(xintercept=se), size = 1.5, colour = "purple", linetype=2)
+p <- p + geom_vline(data = truevals, aes(xintercept=mean), size = 1.5, colour = "purple", linetype=2)
 p <- p+theme(text=element_text(size=25))
 p <- p+theme(axis.text.x = element_text(size=13)) #+ ylim(c(0,100))
 print(p)
 
 ggsave("ncc_validation_SE.png", width = 15, height = 11 )
+
+
+## html table
+library(xtable)
+
+print(xtable(reshape(seData, idvar = c("variable"), timevar = "method", direction = "wide")), type = "html")
 
 
 
