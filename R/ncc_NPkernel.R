@@ -40,6 +40,7 @@ NCC.NP.kn.PTB.s.y <- function(data,V.IND,Iik0=Iik0.mat,wgtk.ptb=NULL,B0=500,Zmat
       Shat.yk.ptb[,b] = CondSurv.FUN(wgtk.ptb[,b],xk, dk, yk.ptb[,b], t0, hhat.v); }
   } else {
     for (b in 1:B0) {
+      
       Shat.yk.ptb[,b] = CondSurv.FUN(wgtk.ptb[,b],xk, dk, yk, t0, hhat.v); }
   }
   
@@ -88,8 +89,12 @@ PTB.beta.FUN.explicit <- function(wgt.ptb,data,betahat)
 
 CondSurv.FUN<-function(IPW, xi, di, yi, tt0, bw)
 {
-  nv = length(xi); Mi = rep(0,nv); yy = yi
-  kerni.yy = Kern.FUN(c(yy),c(yi),bw)*IPW; ## nv x ny matrix
+  nv = length(xi); 
+  
+  #kerni.yy = Kern.FUN(c(yi),c(yi),bw)*IPW; ## nv x ny matrix
+  kerni.yy <- (VTM(c(yi), length(yi))-c(yi))/bw
+  kerni.yy <- dnorm(kerni.yy)/bw
+  
   skern.yy = colSums(kerni.yy)
   tmpind = (xi<=tt0)&(di==1); tj = xi[tmpind]; nj = length(tj)
   pi.tj.yy = sum.I(tj,"<=",xi,kerni.yy)/VTM(skern.yy,nj) ## nj x ny matrix ##    
