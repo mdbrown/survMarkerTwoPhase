@@ -39,10 +39,10 @@ NumericMatrix CondSurv_FUN_C(NumericVector IPW, NumericVector xi, IntegerVector 
   */
   
   int nv = xi.size(); 
-  mat kerni_yy = Vec2Mat(Rcpp::as<arma::vec >(yi), yi.size()); 
+  mat kerni_yy = Vec2Mat(as<vec >(yi), yi.size()); 
   
   
-  return Rcpp::as<Rcpp::NumericMatrix>(wrap(kerni_yy)); 
+  return as<NumericMatrix>(wrap(kerni_yy)); 
   
 }
 
