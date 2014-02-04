@@ -133,13 +133,13 @@ table(sampleInd) #subcohort sample size of 352
 #marker data is unavailable for those not in the subcohort
 cohortData_ncc$Y[sampleInd==0] = NA  
 
-#now we need to build the risk set matrix,
+#now we need to build the set matrix,
 #which will be dimension (# of cases) x (nmatch + 1), so 200x3 here
-#each row denotes a risk set, with the case id followed by the matched control ids
-RiskSets <- matrix(nrow = sum(cohortData_ncc$status), ncol = nmatch +1)
+#each row denotes a selected set, with the case id followed by the matched control ids
+Sets <- matrix(nrow = sum(cohortData_ncc$status), ncol = nmatch +1)
 
 for(i in subcohort_ncc$Set){
-  RiskSets[i, ] <- unlist(subset(subcohort_ncc, Set==i, select=Map))
+  Sets[i, ] <- unlist(subset(subcohort_ncc, Set==i, select=Map))
 }
 
 ```
@@ -154,7 +154,7 @@ survMTP.ncc(time = survTime,
          subcoh=subcohort, 
          id = id, 
          data = cohortData_ncc,
-         risk.sets = RiskSets, 
+         sets = Sets, 
          estimation.method = "NP", 
          predict.time = 2 , 
          marker.cutpoint = 0)
@@ -168,7 +168,7 @@ survMTP.ncc(time = survTime,
          subcoh=subcohort, 
          id = id, 
          data = cohortData_ncc,
-         risk.sets = RiskSets, 
+         sets = Sets, 
          estimation.method = "SP", 
          predict.time = 2 , 
          marker.cutpoint = 0)

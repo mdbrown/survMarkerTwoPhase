@@ -178,13 +178,13 @@ table(sampleInd)  #subcohort sample size of 352
 # marker data is unavailable for those not in the subcohort
 cohortData_ncc$Y[sampleInd == 0] = NA
 
-# now we need to build the risk set matrix, which will be dimension (# of
-# cases) x (nmatch + 1), so 200x3 here each row denotes a risk set, with the
+# now we need to build the set matrix, which will be dimension (# of cases)
+# x (nmatch + 1), so 200x3 here each row denotes a selected set, with the
 # case id followed by the matched control ids
-RiskSets <- matrix(nrow = sum(cohortData_ncc$status), ncol = nmatch + 1)
+Sets <- matrix(nrow = sum(cohortData_ncc$status), ncol = nmatch + 1)
 
 for (i in subcohort_ncc$Set) {
-    RiskSets[i, ] <- unlist(subset(subcohort_ncc, Set == i, select = Map))
+    Sets[i, ] <- unlist(subset(subcohort_ncc, Set == i, select = Map))
 }
 ```
 
@@ -195,8 +195,8 @@ Now we are ready to calculate the measures using `survMTP.ncc`.
 ```r
 # Nonparametric estimates
 survMTP.ncc(time = survTime, event = status, marker = Y, subcoh = subcohort, 
-    id = id, data = cohortData_ncc, risk.sets = RiskSets, estimation.method = "NP", 
-    predict.time = 2, marker.cutpoint = 0)
+    id = id, data = cohortData_ncc, sets = Sets, estimation.method = "NP", predict.time = 2, 
+    marker.cutpoint = 0)
 ```
 
 ```
@@ -205,11 +205,11 @@ survMTP.ncc(time = survTime, event = status, marker = Y, subcoh = subcohort,
 ## 
 ##         estimate     se      lower 0.95  upper 0.95
 ## 
-## AUC        0.742     0.027         0.690       0.795 
-## FPR(c)     0.379     0.032         0.316       0.443 
-## TPR(c)     0.684     0.044         0.598       0.770 
-## NPV(c)     0.875     0.020         0.837       0.914 
-## PPV(c)     0.335     0.033         0.270       0.401 
+## AUC        0.725     0.012         0.701       0.749 
+## FPR(c)     0.374     0.029         0.317       0.431 
+## TPR(c)     0.646     0.030         0.586       0.706 
+## NPV(c)     0.831     0.008         0.816       0.846 
+## PPV(c)     0.385     0.015         0.356       0.413 
 ## 
 ##  marker cutpoint: c = 0
 ```
@@ -219,8 +219,8 @@ survMTP.ncc(time = survTime, event = status, marker = Y, subcoh = subcohort,
 ```r
 # Semiparametric estimates
 survMTP.ncc(time = survTime, event = status, marker = Y, subcoh = subcohort, 
-    id = id, data = cohortData_ncc, risk.sets = RiskSets, estimation.method = "SP", 
-    predict.time = 2, marker.cutpoint = 0)
+    id = id, data = cohortData_ncc, sets = Sets, estimation.method = "SP", predict.time = 2, 
+    marker.cutpoint = 0)
 ```
 
 ```

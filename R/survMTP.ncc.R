@@ -6,7 +6,7 @@ survMTP.ncc <- function(time,
                         subcoh, 
                         id, 
                         data,
-                        risk.sets, 
+                        sets, 
                         estimation.method = "NP", 
                         predict.time,
                         alpha = 0.05, 
@@ -74,9 +74,9 @@ survMTP.ncc <- function(time,
 
   risk.set.N <- sapply( case.times, function(x) sum(time > x))
   
-  #so i can match the risk.set.N and time up with the already provided risk.sets
-  ind <- match(case.IDs, risk.sets[,1])
-  risk.sets <- data.frame(case.times[ind], risk.set.N[ind], risk.sets)
+  #so i can match the risk.set.N and time up with the already provided sets
+  ind <- match(case.IDs, sets[,1])
+  sets <- data.frame(case.times[ind], risk.set.N[ind], sets)
   
   ## ixk indicator matrix, one row for each case, one column for each control  
   ## indicates whether control k is in the matched risk set for case i 
@@ -95,18 +95,18 @@ survMTP.ncc <- function(time,
   if(estimation.method=="NP"){
     
 
-    result <- NCC_EstandSE_NP(data = list(inputData, risk.sets, Iik), 
+    result <- NCC_EstandSE_NP(data = list(inputData, sets, Iik), 
                              cutpoint = marker.cutpoint,
                              predict.time = predict.time, 
-                             nmatch = ncol(risk.sets)-3, 
+                             nmatch = ncol(sets)-3, 
                              B0 = Npert)
 
   }else if(is.element(estimation.method, c("S", "SP", "Semi-Parametric", "semiparametric"))){
 
-    result <- NCC_EstandSE_SP(data = list(inputData, risk.sets, Iik), 
+    result <- NCC_EstandSE_SP(data = list(inputData, sets, Iik), 
                              cutpoint = marker.cutpoint,
                              predict.time = predict.time, 
-                              nmatch = ncol(risk.sets)-3, 
+                              nmatch = ncol(sets)-3, 
                               B0 = Npert)
 
     
