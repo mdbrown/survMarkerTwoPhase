@@ -235,13 +235,13 @@
 <span class="c"># marker data is unavailable for those not in the subcohort</span>
 <span class="c">cohortData_ncc$Y[sampleInd == 0] = NA</span>
 
-<span class="c"># now we need to build the risk set matrix, which will be dimension (# of</span>
-<span class="c"># cases) x (nmatch + 1), so 200x3 here each row denotes a risk set, with the</span>
+<span class="c"># now we need to build the  set matrix, which will be dimension (# of</span>
+<span class="c"># cases) x (nmatch + 1), so 200x3 here each row denotes a selected set, with the</span>
 <span class="c"># case id followed by the matched control ids</span>
 <span class="c">RiskSets &lt;- matrix(nrow = sum(cohortData_ncc$status), ncol = nmatch + 1)</span>
 
 <span class="c">for (i in subcohort_ncc$Set) {</span>
-<span class="c">    RiskSets[i, ] &lt;- unlist(subset(subcohort_ncc, Set == i, select = Map))</span>
+<span class="c">     Sets[i, ] &lt;- unlist(subset(subcohort_ncc, Set == i, select = Map))</span>
 <span class="c">}</span>
 </pre></div>
 
@@ -249,7 +249,7 @@
 
 <div class="highlight highlight-r"><pre><span class="c"># Nonparametric estimates</span>
 <span class="c">survMTP.ncc(time = survTime, event = status, marker = Y, subcoh = subcohort, </span>
-<span class="c">    id = id, data = cohortData_ncc, risk.sets = RiskSets, estimation.method = "NP", </span>
+<span class="c">    id = id, data = cohortData_ncc, sets = Sets, estimation.method = "NP", </span>
 <span class="c">    predict.time = 2, marker.cutpoint = 0)</span>
 </pre></div>
 
@@ -269,7 +269,7 @@
 
 <div class="highlight highlight-r"><pre><span class="c"># Semiparametric estimates</span>
 <span class="c">survMTP.ncc(time = survTime, event = status, marker = Y, subcoh = subcohort, </span>
-<span class="c">    id = id, data = cohortData_ncc, risk.sets = RiskSets, estimation.method = "SP", </span>
+<span class="c">    id = id, data = cohortData_ncc, sets = Sets, estimation.method = "SP", </span>
 <span class="c">    predict.time = 2, marker.cutpoint = 0)</span>
 </pre></div>
 
