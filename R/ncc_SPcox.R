@@ -83,14 +83,17 @@ PtbNCC.WGT.FUN <- function(data, V.IND, Iik0, Zmatch=NULL,B0=500,wgtk = NULL, m.
   dj.i = xj.i = matrix(NA,ncol=m.match,nrow=n1)
   
   V.IND <- as.matrix(V.IND)
-  #xj.i[!is.na(c(V.IND))] = data[c(V.IND),1] 
+
   xj.i= data[c(V.IND),1] ;
   xj.i=xj.i[!is.na(xj.i)]
-  #dj.i[!is.na(c(V.IND))] = data[c(V.IND),2] 
+ 
   dj.i= data[c(V.IND),2] ; dj.i=dj.i[!is.na(xj.i)]
   ind.control = c(dj.i!=1) ## try to identify those dj.i = 1 and sampled as control 
-  id.0j.all = sort(unique(na.omit(V.IND[ind.control]))); id.all = sort(unique(c(id.ii,id.0j.all)))
-  x0j = c(xj.i)[match(id.0j.all,c(V.IND))]; nsub = length(id.all)
+  id.0j.all = sort(unique(na.omit(V.IND[ind.control]))); 
+  id.all = sort(unique(c(id.ii,id.0j.all)))
+  
+  x0j = c(xj.i)[match(id.0j.all,c(V.IND))]; 
+  nsub = length(id.all)
   
   wptb.mat = matrix(0,ncol=B0,nrow=nsub); 
   for(bb in 1:B0)

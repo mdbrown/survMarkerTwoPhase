@@ -51,25 +51,31 @@ arma::mat CondSurv_FUN_C(arma::mat IPW, arma::colvec xi, arma::uvec di, arma::co
   arma::mat output(N, B0); // called in Shat.yk.ptb in ncc_NPkernel.R
   arma::uvec tmpind = find((xi <= tt0)%(di==1));
    
-  arma::vec tj = xi.elem(tmpind);
+  arma::colvec tj = xi.elem(tmpind);
   int nj = tj.n_elem;
   
   //define matrices out here first so I am not creating copies in the future
+  arma::mat kerniyy(yi.n_rows, yi.n_rows); 
+  arma::colvec skernyy(yi.n_rows); 
+  arma::mat tmpDenom(nj, yi.n_rows); 
+  arma::mat pitjyy(nj, yi.n_rows); 
+  arma::mat dLamtjyy(nj, yi.n_rows); 
+  arma::rowvec Shatt0yi(yi.n_rows); 
   
   for(int b=0; b < B0; b++){
  
-     arma::mat kerniyy = Vec2Mat(yi, yi.n_rows); 
+     kerniyy = Vec2Mat(yi, yi.n_rows); 
      kerniyy.each_col() -= yi;
      kerniyy /= bw; 
      kerniyy = myDnorm(kerniyy)/bw;
-     kerniyy.each_col() %= IPW.col(b);  //element wise multimplication 
+     kerniyy.each_col() %= IPW.col(b);  //element wise multiplication 
      
-     arma::colvec skernyy = sum(kerniyy, 0).t(); 
+     skernyy = sum(kerniyy, 0).t(); 
       
-     arma::mat tmpDenom = Vec2Mat(skernyy, nj); 
-     arma::mat pitjyy = CSumI(conv_to<colvec>::from(tj), 1, xi, kerniyy, TRUE)/tmpDenom; 
-     arma::mat dLamtjyy = (kerniyy.rows(tmpind)/pitjyy)/tmpDenom;
-     arma::rowvec Shatt0yi = exp(-sum(dLamtjyy, 0));
+     tmpDenom = Vec2Mat(skernyy, nj); 
+     pitjyy = CSumI(tj, 1, xi, kerniyy, TRUE)/tmpDenom; 
+     dLamtjyy = (kerniyy.rows(tmpind)/pitjyy)/tmpDenom;
+     Shatt0yi = exp(-sum(dLamtjyy, 0));
      
      output.col(b) = Shatt0yi.t(); 
    }

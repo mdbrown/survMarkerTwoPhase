@@ -18,7 +18,7 @@ p.cch.np <- profr(survMTP.cch(time =survTime,
             estimation.method = "NP",  
             predict.time = 2, 
             marker.cutpoint = 0))
-
+plot(p.cch.np)
 #estimate accuracy measures using semi-parametric estimates
 survMTP.cch(time =survTime, 
             event = status, 
@@ -41,7 +41,7 @@ p.ncc.np <- profr(survMTP.ncc(time = survTime,
             subcoh=subcohort, 
             id = id, 
             data = cohortData_ncc,
-            risk.sets = RiskSets, 
+            sets = RiskSets, 
             estimation.method = "NP", 
             predict.time = 2 , 
             marker.cutpoint = 0))
@@ -55,7 +55,7 @@ p.ncc.sp <- profr(survMTP.ncc(time = survTime,
             subcoh=subcohort, 
             id = id, 
             data = cohortData_ncc,
-            risk.sets = RiskSets, 
+            sets = RiskSets, 
             estimation.method = "SP", 
             predict.time = 2 , 
             marker.cutpoint = 0))

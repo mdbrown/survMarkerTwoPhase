@@ -39,24 +39,24 @@ NCC.NP.kn.PTB.s.y <- function(data,V.IND,Iik0=Iik0.mat,wgtk.ptb=NULL,B0=500,Zmat
   #  yk = ebyk   	
   #}
   
-  browser()
-  
   hhat.v = 1.06*min(sd(yk),IQR(yk)/1.34)*nv^(-bw.power)
   Shat.yk = CondSurv.FUN(wgtk, xk, dk, yk, t0, hhat.v); 
-  
+
   Shat.yk.ptb <- CondSurv_FUN_C(wgtk.ptb,as.matrix(xk), dk, yk, t0, hhat.v)
+
   #if (npy>1) {
   #  for (b in 1:B0) {
   #    hhat.v = 1.06*min(sd(yk.ptb[,b]),IQR(yk.ptb[,b])/1.34)*nv^(-bw.power)
   #    Shat.yk.ptb[,b] = CondSurv.FUN(wgtk.ptb[,b],xk, dk, yk.ptb[,b], t0, hhat.v); }
   #} else {
-  #Shat.yk.ptb2=matrix(0,nv,B0)
-#  
-#    for (b in 1:B0) {
-#   
-#      Shat.yk.ptb2[,b] =  CondSurv.FUN(wgtk.ptb[,b],xk, dk, yk, t0, hhat.v); 
-#    
-#    }
+  
+  
+ # Shat.yk.ptb2=matrix(0,nv,B0)
+
+  #  for (b in 1:B0) {
+  #Shat.yk.ptb2[,b] =  CondSurv.FUN(wgtk.ptb[,b],xk, dk, yk, t0, hhat.v); 
+  #  }
+  
   #}  
   
   Fyk = sum.I(yk, ">=", yk, wgtk)/sum(wgtk) 
