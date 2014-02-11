@@ -1,11 +1,10 @@
 // [[Rcpp::depends("RcppArmadillo")]]
 #include <RcppArmadillo.h>
-#include <Rcpp.h>
 #include "Code.h"
 
 using namespace std; 
-using namespace arma;
-using namespace Rcpp; 
+using namespace Rcpp;
+using namespace arma; 
 
 // Below is a simple example of exporting a C++ function to R. You can
 // source this function into an R session using the Rcpp::sourceCpp 
@@ -14,16 +13,23 @@ using namespace Rcpp;
 // For more on using Rcpp click the Help button on the editor toolbar
 
 // [[Rcpp::export]]
-NumericVector timesTwo(NumericVector x) {
-   return x.sort() * 2;
+arma::mat myDnorm( arma::mat X){
+  
+  return as_scalar(1/sqrt(2.0*datum::pi))*exp(-pow(X, 2)/2.0); 
+  
 }
 
 // [[Rcpp::export]]
-NumericMatrix CondSurv_FUN_C(NumericVector IPW, NumericVector xi, IntegerVector di, NumericVector yi, double tt0, double bw){
+arma::mat CondSurv_FUN_C(arma::mat IPW, arma::colvec xi, arma::uvec di, arma::colvec yi, double tt0, double bw){
   
-  
+  /*for(b in 1:B0) {
+      
+      Shat.yk.ptb[,b] = CondSurv.FUN(wgtk.ptb[,b],xk, dk, yk, t0, hhat.v); 
+    
+    }
+  */
   /*
-  nv = length(xi); 
+  nv = length(xi);
   
   #kerni.yy = Kern.FUN(c(yi),c(yi),bw)*IPW; ## nv x ny matrix
   kerni.yy <- (VTM(c(yi), length(yi))-c(yi))/bw
@@ -38,11 +44,37 @@ NumericMatrix CondSurv_FUN_C(NumericVector IPW, NumericVector xi, IntegerVector 
   Shat.t0.yi    
   */
   
-  int nv = xi.size(); 
-  mat kerni_yy = Vec2Mat(as<vec >(yi), yi.size()); 
   
+  int N = xi.n_elem; 
+  int B0 = IPW.n_cols; 
   
-  return as<NumericMatrix>(wrap(kerni_yy)); 
+  arma::mat output(N, B0); // called in Shat.yk.ptb in ncc_NPkernel.R
+  arma::uvec tmpind = find((xi <= tt0)%(di==1));
+   
+  arma::vec tj = xi.elem(tmpind);
+  int nj = tj.n_elem;
+  
+  //define matrices out here first so I am not creating copies in the future
+  
+  for(int b=0; b < B0; b++){
+ 
+     arma::mat kerniyy = Vec2Mat(yi, yi.n_rows); 
+     kerniyy.each_col() -= yi;
+     kerniyy /= bw; 
+     kerniyy = myDnorm(kerniyy)/bw;
+     kerniyy.each_col() %= IPW.col(b);  //element wise multimplication 
+     
+     arma::colvec skernyy = sum(kerniyy, 0).t(); 
+      
+     arma::mat tmpDenom = Vec2Mat(skernyy, nj); 
+     arma::mat pitjyy = CSumI(conv_to<colvec>::from(tj), 1, xi, kerniyy, TRUE)/tmpDenom; 
+     arma::mat dLamtjyy = (kerniyy.rows(tmpind)/pitjyy)/tmpDenom;
+     arma::rowvec Shatt0yi = exp(-sum(dLamtjyy, 0));
+     
+     output.col(b) = Shatt0yi.t(); 
+   }
+  
+  return output; 
   
 }
 

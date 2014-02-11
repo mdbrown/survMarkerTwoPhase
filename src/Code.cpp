@@ -1,6 +1,6 @@
 // [[Rcpp::depends("RcppArmadillo")]]
 #include <RcppArmadillo.h>
-#include <Rcpp.h>
+
 #include "Code.h"
 
 using namespace std; 
@@ -9,6 +9,7 @@ using namespace Rcpp;
 
 
 uvec myRank( colvec x){
+  
    int n = x.n_elem; 
    uvec ind(n); 
    ind(0) = 1; 
@@ -90,8 +91,9 @@ colvec myPmin( colvec myvec, double x){
    myvec(find(myvec > x)).fill(x); 
    return myvec; 
 }
- 
-  
+
+
+
 SEXP getWEXP(SEXP datar_SEXP, SEXP Yr_SEXP, SEXP N_SEXP, SEXP RT_outr_SEXP, SEXP predictTime_SEXP, SEXP resid_sco_SEXP, SEXP fitvar_SEXP){
    //convert SEXP to arma
  

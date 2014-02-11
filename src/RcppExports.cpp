@@ -6,15 +6,15 @@
 
 using namespace Rcpp;
 
-// timesTwo
-NumericVector timesTwo(NumericVector x);
-RcppExport SEXP survMarkerTwoPhase_timesTwo(SEXP xSEXP) {
+// myDnorm
+arma::mat myDnorm(arma::mat X);
+RcppExport SEXP survMarkerTwoPhase_myDnorm(SEXP XSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP );
-        NumericVector __result = timesTwo(x);
+        Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP );
+        arma::mat __result = myDnorm(X);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
@@ -22,19 +22,19 @@ BEGIN_RCPP
 END_RCPP
 }
 // CondSurv_FUN_C
-NumericMatrix CondSurv_FUN_C(NumericVector IPW, NumericVector xi, IntegerVector di, NumericVector yi, double tt0, double bw);
+arma::mat CondSurv_FUN_C(arma::mat IPW, arma::colvec xi, arma::uvec di, arma::colvec yi, double tt0, double bw);
 RcppExport SEXP survMarkerTwoPhase_CondSurv_FUN_C(SEXP IPWSEXP, SEXP xiSEXP, SEXP diSEXP, SEXP yiSEXP, SEXP tt0SEXP, SEXP bwSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< NumericVector >::type IPW(IPWSEXP );
-        Rcpp::traits::input_parameter< NumericVector >::type xi(xiSEXP );
-        Rcpp::traits::input_parameter< IntegerVector >::type di(diSEXP );
-        Rcpp::traits::input_parameter< NumericVector >::type yi(yiSEXP );
+        Rcpp::traits::input_parameter< arma::mat >::type IPW(IPWSEXP );
+        Rcpp::traits::input_parameter< arma::colvec >::type xi(xiSEXP );
+        Rcpp::traits::input_parameter< arma::uvec >::type di(diSEXP );
+        Rcpp::traits::input_parameter< arma::colvec >::type yi(yiSEXP );
         Rcpp::traits::input_parameter< double >::type tt0(tt0SEXP );
         Rcpp::traits::input_parameter< double >::type bw(bwSEXP );
-        NumericMatrix __result = CondSurv_FUN_C(IPW, xi, di, yi, tt0, bw);
+        arma::mat __result = CondSurv_FUN_C(IPW, xi, di, yi, tt0, bw);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

@@ -1,3 +1,3 @@
-export(print.SurvMTP_cch, print.SurvMTP_ncc, survMTP.cch, survMTP.ncc, CondSurv_FUN_C, VTM, sum.I)
+export(print.SurvMTP_cch, print.SurvMTP_ncc, survMTP.cch, survMTP.ncc, CondSurv_FUN_C, VTM, sum.I, myDnorm)
 useDynLib(survMarkerTwoPhase)
 importFrom(Rcpp, sourceCpp)

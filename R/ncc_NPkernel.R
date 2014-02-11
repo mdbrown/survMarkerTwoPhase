@@ -7,8 +7,18 @@ NCC.NP.kn.PTB.s.y <- function(data,V.IND,Iik0=Iik0.mat,wgtk.ptb=NULL,B0=500,Zmat
   
 
   bw.power = 0.3
-  xi = data[,1]; di = data[,2]; vi = data[,3]; yi = data[,-(1:3),drop=F];yi=as.matrix(yi); n.t0 = length(t0); nv = sum(vi)
-  NN = length(xi); nv = sum(vi); tj = V.IND[,1]; pi.tj = V.IND[,2]/NN
+  xi = data[,1]; 
+  di = data[,2]; 
+  vi = data[,3]; 
+  yi = data[,-(1:3),drop=F];
+  yi=as.matrix(yi); 
+  
+  n.t0 = length(t0);
+  NN = length(xi); 
+  nv = sum(vi);
+  
+  tj = V.IND[,1]; 
+  pi.tj = V.IND[,2]/NN
   wgtk = 1/FNCC.WGT.FUN(data,V.IND,Iik0=Iik0.mat,Zmatch.ind, m.match = m.match); 
   
   xk = xi[vi==1]; dk = di[vi==1]; yk = yi[vi==1,,drop=F]; idk = (1:NN)[vi==1];  
@@ -17,32 +27,37 @@ NCC.NP.kn.PTB.s.y <- function(data,V.IND,Iik0=Iik0.mat,wgtk.ptb=NULL,B0=500,Zmat
   wgtk.ptb = PtbNCC.WGT.FUN(data,V.IND,Iik0,B0=B0, m.match=m.match); 
   wgtk.ptb = wgtk.ptb[match(idk,wgtk.ptb[,1]),-1]
   npy = dim(yk)[2]
-  Shat.yk.ptb=matrix(0,nv,B0)
-  
-  if (npy>1) {
-    betahat = coxph(Surv(xk,dk)~yk,weights=wgtk,robust=T); 
-    betahat=betahat$coef; 
-    ebyk = c(exp(yk%*%betahat));
+
+  #if (npy>1) {
+  #  betahat = coxph(Surv(xk,dk)~yk,weights=wgtk,robust=T); 
+  #  betahat=betahat$coef; 
+  #  ebyk = c(exp(yk%*%betahat));
     
-    betaptb = PTB.beta.FUN.explicit(wgtk.ptb,cbind(xk,dk,wgtk,yk),betahat=betahat) 
-    yk.ptb= matrix(0,nv,B0)
-    yk.ptb = yk%*%betaptb
-    yk = ebyk   	
-  }
+  #  betaptb = PTB.beta.FUN.explicit(wgtk.ptb,cbind(xk,dk,wgtk,yk),betahat=betahat) 
+  #  yk.ptb= matrix(0,nv,B0)
+  #  yk.ptb = yk%*%betaptb
+  #  yk = ebyk   	
+  #}
   
-  
+  browser()
   
   hhat.v = 1.06*min(sd(yk),IQR(yk)/1.34)*nv^(-bw.power)
-  Shat.yk = CondSurv.FUN(wgtk,xk, dk, yk, t0, hhat.v); 
-  if (npy>1) {
-    for (b in 1:B0) {
-      hhat.v = 1.06*min(sd(yk.ptb[,b]),IQR(yk.ptb[,b])/1.34)*nv^(-bw.power)
-      Shat.yk.ptb[,b] = CondSurv.FUN(wgtk.ptb[,b],xk, dk, yk.ptb[,b], t0, hhat.v); }
-  } else {
-    for (b in 1:B0) {
-      
-      Shat.yk.ptb[,b] = CondSurv.FUN(wgtk.ptb[,b],xk, dk, yk, t0, hhat.v); }
-  }
+  Shat.yk = CondSurv.FUN(wgtk, xk, dk, yk, t0, hhat.v); 
+  
+  Shat.yk.ptb <- CondSurv_FUN_C(wgtk.ptb,as.matrix(xk), dk, yk, t0, hhat.v)
+  #if (npy>1) {
+  #  for (b in 1:B0) {
+  #    hhat.v = 1.06*min(sd(yk.ptb[,b]),IQR(yk.ptb[,b])/1.34)*nv^(-bw.power)
+  #    Shat.yk.ptb[,b] = CondSurv.FUN(wgtk.ptb[,b],xk, dk, yk.ptb[,b], t0, hhat.v); }
+  #} else {
+  #Shat.yk.ptb2=matrix(0,nv,B0)
+#  
+#    for (b in 1:B0) {
+#   
+#      Shat.yk.ptb2[,b] =  CondSurv.FUN(wgtk.ptb[,b],xk, dk, yk, t0, hhat.v); 
+#    
+#    }
+  #}  
   
   Fyk = sum.I(yk, ">=", yk, wgtk)/sum(wgtk) 
   Fyk.ptb = matrix(0,length(yk),B0)
@@ -92,8 +107,10 @@ CondSurv.FUN<-function(IPW, xi, di, yi, tt0, bw)
   nv = length(xi); 
   
   #kerni.yy = Kern.FUN(c(yi),c(yi),bw)*IPW; ## nv x ny matrix
+ # tmp <- CondSurv_FUN_C(as.matrix(IPW), xi, di, yi, tt0, bw)
+
   kerni.yy <- (VTM(c(yi), length(yi))-c(yi))/bw
-  kerni.yy <- dnorm(kerni.yy)/bw
+  kerni.yy <- (dnorm(kerni.yy)/bw)*IPW
   
   skern.yy = colSums(kerni.yy)
   tmpind = (xi<=tt0)&(di==1); tj = xi[tmpind]; nj = length(tj)
