@@ -21,7 +21,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          
+
           <div class="nav-collapse collapse">
             <ul class="nav pull-right">
 
@@ -64,7 +64,7 @@
 
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
-	
+
 <!--	<section class="innerLeft">
 	<ul>
 	<li><a href="#tutorial">Tutorial</a>
@@ -93,7 +93,7 @@
 
 <div class="highlight highlight-r"><pre><span class="c"># download the package from github</span>
 <span class="c">if (!require("devtools")) install.packages("devtools")</span>
-<span class="c">devtools::install_github("survMarkerTwoPhase", "mdbrown")</span>
+<span class="c">devtools::install_github("survMarkerTwoPhase", "mdbrown", args="--no-multiarch")</span>
 </pre></div>
 
 <div class="highlight highlight-r"><pre><span class="c">library(survMarkerTwoPhase)</span>
@@ -133,7 +133,7 @@
 </pre></div>
 
 <pre><code>## sampleInd
-##   0   1 
+##   0   1
 ## 207 293
 </code></pre>
 
@@ -169,16 +169,16 @@
 <span class="c">    marker.cutpoint = 0)</span>
 </pre></div>
 
-<pre><code>## 
+<pre><code>##
 ##  Non-parametric estimates under Case-Cohort study design.
-## 
+##
 ##         estimate
 ## AUC        0.749
 ## TPR(c)     0.699
 ## FPR(c)     0.394
 ## PPV(c)     0.331
 ## NPV(c)     0.878
-## 
+##
 ##  marker cutpoint: c = 0
 </code></pre>
 
@@ -190,9 +190,9 @@
 <span class="c">    marker.cutpoint = 0)</span>
 </pre></div>
 
-<pre><code>## 
+<pre><code>##
 ##  Semi-parametric estimates under Case-Cohort study design.
-## 
+##
 ##         estimate
 ## coef       1.088
 ## AUC        0.788
@@ -200,7 +200,7 @@
 ## FPR(c)     0.347
 ## PPV(c)     0.386
 ## NPV(c)     0.909
-## 
+##
 ##  marker cutpoint: c = 0
 </code></pre>
 
@@ -253,17 +253,17 @@
 <span class="c">    predict.time = 2, marker.cutpoint = 0)</span>
 </pre></div>
 
-<pre><code>## 
+<pre><code>##
 ##  Non-parametric estimates under Nested Case-Control study design.
-## 
+##
 ##         estimate     se      lower 0.95  upper 0.95
-## 
-## AUC        0.742     0.027         0.690       0.795 
-## FPR(c)     0.379     0.032         0.316       0.443 
-## TPR(c)     0.684     0.044         0.598       0.770 
-## NPV(c)     0.875     0.020         0.837       0.914 
-## PPV(c)     0.335     0.033         0.270       0.401 
-## 
+##
+## AUC        0.742     0.027         0.690       0.795
+## FPR(c)     0.379     0.032         0.316       0.443
+## TPR(c)     0.684     0.044         0.598       0.770
+## NPV(c)     0.875     0.020         0.837       0.914
+## PPV(c)     0.335     0.033         0.270       0.401
+##
 ##  marker cutpoint: c = 0
 </code></pre>
 
@@ -273,18 +273,18 @@
 <span class="c">    predict.time = 2, marker.cutpoint = 0)</span>
 </pre></div>
 
-<pre><code>## 
+<pre><code>##
 ##  Semi-parametric estimates under Nested Case-Control study design.
-## 
+##
 ##         estimate     se      lower 0.95  upper 0.95
-## 
-## coef       1.017     0.082         0.857       1.177 
-## AUC        0.777     0.020         0.738       0.815 
-## FPR(c)     0.356     0.030         0.297       0.416 
-## TPR(c)     0.755     0.030         0.696       0.813 
-## NPV(c)     0.900     0.013         0.875       0.926 
-## PPV(c)     0.381     0.032         0.319       0.443 
-## 
+##
+## coef       1.017     0.082         0.857       1.177
+## AUC        0.777     0.020         0.738       0.815
+## FPR(c)     0.356     0.030         0.297       0.416
+## TPR(c)     0.755     0.030         0.696       0.813
+## NPV(c)     0.900     0.013         0.875       0.926
+## PPV(c)     0.381     0.032         0.319       0.443
+##
 ##  marker cutpoint: c = 0
 </code></pre>
 
@@ -297,17 +297,17 @@
 <p>To validate the package procedures, a small simulation (1,000 replicates) was run. For each replicate, time-to-event cohort data was simulated with 80% censoring and sample size <em>n=1,000</em>. CCH and NCC sub samples were chosen and accuracy measures where estimated. </p>
 <h4>Case-cohort</h4>
 
-<img alt="Sampling distribution of estimates under CCH design" src="img/cch_validation.png"> 
+<img alt="Sampling distribution of estimates under CCH design" src="img/cch_validation.png">
 <em>Non-parametric and semi-parametric estimates under the CCH design. True measure value indicated by the purple vertical lines.</em>
 
 
 <h4>Nested case-control</h4>
 <p>For nested case-control designs, standard errors where also estimated. To validate these estimates, we compare the sampling distribution of SE estimates to the empirical standard error across simulations of accuracy measure estimates. The table below shows the mean estimate across simulations compared with the true parameter value.</p>
 
-<img alt="Sampling distribution of estimates under NCC design" src="img/ncc_validation.png"> 
+<img alt="Sampling distribution of estimates under NCC design" src="img/ncc_validation.png">
 <em>Non-parametric and semi-parametric estimates of accuracy measures under the NCC design. True measure value indicated by the purple vertical lines. The table below shows the mean estimate across simulations compared with the true parameter value. </em>
 
-<img alt="Sampling distribution of estimates under NCC design" src="img/ncc_validation_SE.png"> 
+<img alt="Sampling distribution of estimates under NCC design" src="img/ncc_validation_SE.png">
 <em>Non-parametric and semi-parametric estimates of standard error under the NCC design. Empirical standard error calculated from the simulated measure sampling distribution is shown as the purple vertical dash-lines. A table with mean se across simulations compared with empirical se's is shown below</em>
 
 <!-- html table generated in R 3.0.2 by xtable 1.7-1 package -->
