@@ -238,7 +238,7 @@
 <span class="c"># now we need to build the  set matrix, which will be dimension (# of</span>
 <span class="c"># cases) x (nmatch + 1), so 200x3 here each row denotes a selected set, with the</span>
 <span class="c"># case id followed by the matched control ids</span>
-<span class="c">RiskSets &lt;- matrix(nrow = sum(cohortData_ncc$status), ncol = nmatch + 1)</span>
+<span class="c">Sets &lt;- matrix(nrow = sum(cohortData_ncc$status), ncol = nmatch + 1)</span>
 
 <span class="c">for (i in subcohort_ncc$Set) {</span>
 <span class="c">     Sets[i, ] &lt;- unlist(subset(subcohort_ncc, Set == i, select = Map))</span>
