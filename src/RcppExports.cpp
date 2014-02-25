@@ -41,3 +41,24 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// getWEXP
+Rcpp::List getWEXP(arma::mat data, arma::mat Y, int N, arma::mat RT_out, double predictTime, arma::vec resid_sco, double fitvar);
+RcppExport SEXP survMarkerTwoPhase_getWEXP(SEXP dataSEXP, SEXP YSEXP, SEXP NSEXP, SEXP RT_outSEXP, SEXP predictTimeSEXP, SEXP resid_scoSEXP, SEXP fitvarSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< arma::mat >::type data(dataSEXP );
+        Rcpp::traits::input_parameter< arma::mat >::type Y(YSEXP );
+        Rcpp::traits::input_parameter< int >::type N(NSEXP );
+        Rcpp::traits::input_parameter< arma::mat >::type RT_out(RT_outSEXP );
+        Rcpp::traits::input_parameter< double >::type predictTime(predictTimeSEXP );
+        Rcpp::traits::input_parameter< arma::vec >::type resid_sco(resid_scoSEXP );
+        Rcpp::traits::input_parameter< double >::type fitvar(fitvarSEXP );
+        Rcpp::List __result = getWEXP(data, Y, N, RT_out, predictTime, resid_sco, fitvar);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}

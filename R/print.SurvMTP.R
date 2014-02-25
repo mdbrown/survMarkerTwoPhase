@@ -22,10 +22,10 @@ print.SurvMTP_cch <- function(x, ...){
     whitespace <- rep(" ", 4)
   }
   
-  cat(whitespace, "estimate")
-            #paste("estimate     se      lower ",
-            #1-x$alpha, "  upper ",
-            #1-x$alpha, "\n",sep = ""))
+  cat(whitespace, #"estimate")
+            paste("estimate     se      lower ",
+            1-x$alpha, "  upper ",
+            1-x$alpha, "\n",sep = ""))
   
   cat("\n")
 
@@ -33,9 +33,9 @@ print.SurvMTP_cch <- function(x, ...){
     if(mynames[i] %in% c("FPR", "TPR" , "NPV" , "PPV") ) mynames[i] = paste(mynames[i], "(c)", sep = "")
     cat(paste(sprintf("%-6s", mynames[i]), 
               sprintf("%10.3f", round(x$estimate[i], 3)), 
-            #  sprintf("%10.3f ", round(x$se[i], 3)), 
-            #  sprintf("%13.3f ", round(x$CIbounds[2,i], 3)), 
-            #  sprintf("%11.3f ", round(x$CIbounds[1,i], 3)),
+              sprintf("%10.3f ", round(x$se[i], 3)), 
+              sprintf("%13.3f ", round(x$CIbounds[2,i], 3)), 
+              sprintf("%11.3f ", round(x$CIbounds[1,i], 3)),
                sep = "")); 
     cat("\n")
     

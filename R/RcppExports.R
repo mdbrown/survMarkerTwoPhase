@@ -9,3 +9,7 @@ CondSurv_FUN_C <- function(IPW, xi, di, yi, tt0, bw) {
     .Call('survMarkerTwoPhase_CondSurv_FUN_C', PACKAGE = 'survMarkerTwoPhase', IPW, xi, di, yi, tt0, bw)
 }
 
+getWEXP <- function(data, Y, N, RT_out, predictTime, resid_sco, fitvar) {
+    .Call('survMarkerTwoPhase_getWEXP', PACKAGE = 'survMarkerTwoPhase', data, Y, N, RT_out, predictTime, resid_sco, fitvar)
+}
+

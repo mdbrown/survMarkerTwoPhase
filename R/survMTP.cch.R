@@ -4,7 +4,9 @@ survMTP.cch <- function(time, event, marker, weights,
                              data, 
                              estimation.method = 'NP', 
                              predict.time, 
-                             marker.cutpoint = 'median'
+                             marker.cutpoint = 'median',
+                             CImethod = "standard",
+                             alpha=0.05
                            ){
   
   
@@ -27,8 +29,7 @@ survMTP.cch <- function(time, event, marker, weights,
   cutoff <- marker.cutpoint
   cutoff.type = "none"; #cutoffN = 100 #functionality to be added later
   SEmethod ="normal"; #bootstraps = 10
-  CImethod = "standard"
-  alpha=0.05
+
   
 
   if(length(cutoff)==0) cutoff = NA;  
@@ -74,21 +75,14 @@ survMTP.cch <- function(time, event, marker, weights,
                                       cutpoint = cutoff,  
                                       measures = measures,
                                       predict.time = predict.time,
-                                      CalVar = FALSE,  
+                                      CalVar = TRUE,  
                                       cutoffN = dim(subcohort.data)[1])  
-    myests <- NULL
-    myests$estimates <- estRawOutput$estimates
+
+
     
-    names(myests$estimates) = c("coef", measures)
-    #names(myests$se) = c("coef", measures)
-    myests$model.fit <- estRawOutput$fit; 
-    myests$marker.cutpoint = cutoff; 
-    #myests$CImethod = CImethod; 
-    #myests$SEmethod = SEmethod;
-    myests$predict.time = predict.time; 
-    #myests$alpha = alpha; 
-    myests$study.design = "Case-Cohort"
-    myests$estimation.method = "Semi-parametric"
+    
+    
+    
   }else if(is.element(estimation.method, c("N", "NP", "Non-Parametric", "nonparametric"))){
 
     mydata <- prepareDataNP(time, event, marker, weights, vi)  
@@ -97,26 +91,25 @@ survMTP.cch <- function(time, event, marker, weights,
                                       cutpoint = cutoff,  
                                       measures = measures,
                                       predict.time = predict.time,
-                                      CalVar = FALSE,  
+                                      CalVar = TRUE,  
                                       subcohort = TRUE)
-    myests <- estRawOutput
-    
-    names(myests$estimates) = c( measures)
-    #names(myests$se) = c("coef", measures)
-    #myests$model.fit <- myests$fit; 
-    myests$marker.cutpoint = cutoff; 
-    #myests$CImethod = CImethod; 
-    #myests$SEmethod = SEmethod;
-    myests$predict.time = predict.time; 
-    #myests$alpha = alpha; 
-    myests$study.design = "Case-Cohort"
-    myests$estimation.method = "Non-parametric"
+
   }else{
     
     stop("estimation.method not set correctly: it must be one of `SP` (or 'semiparametric') or 'NP' (or 'nonparametric')")
   }
-  
-  
+
+  myests <- processRawOutput(estRawOutput, CImethod = "standard", alpha)
+  myests$fit = NULL
+  myests$model.fit <- estRawOutput$fit; 
+  myests$marker.cutpoint = marker.cutpoint; 
+  #myests$CImethod = CImethod; 
+  #myests$SEmethod = SEmethod;
+  myests$predict.time = predict.time; 
+  myests$alpha = alpha; 
+  myests$study.design = "Case-Cohort"
+  myests$estimation.method <- ifelse(estimation.method=="NP", "Non-parametric", 
+                                     "Semi-parametric")
   
 
   

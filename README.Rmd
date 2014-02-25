@@ -3,7 +3,7 @@ survMarkerTwoPhase
 
 This R package computes non-parametric and semi-parametric estimates of accuracy measures for risk prediction markers from survival data under two phase study designs, namely the case-cohort (cch) and the nested case-control (ncc) study designs. Semi-parametric estimates assume a cox proportional hazards model, while non-parametric calculations use kernel based smoothing to obtain estimates.  
 
-The accuracy measures that can be estimated include the **AUC**, **TPR(c)**, **FPR(c)**, **PPV(c)**, and **NPV(c)** for for a specific timepoint and fixed marker cutoff value c. Standard errors, along with normal approximated confidence intervals can be calculated under the ncc design, but are unavailable for the cch design as of now. Standard errors are calculated using perturbation methods. 
+The accuracy measures that can be estimated include the **AUC**, **TPR(c)**, **FPR(c)**, **PPV(c)**, and **NPV(c)** for for a specific timepoint and fixed marker cutoff value c. Standard errors, along with normal approximated confidence intervals are also calculated. 
 
 Below is a brief tutorial to get you started. For more information regarding estimation procedures see the references below. 
 
@@ -23,7 +23,7 @@ devtools::install_github("survMarkerTwoPhase", "mdbrown")
 library(survMarkerTwoPhase)
 
 #simulated data for illustration
-data(SimData)
+data(SimData)  
 head(SimData)
 ```
 
