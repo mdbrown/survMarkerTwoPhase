@@ -57,29 +57,33 @@ prepareDataNP <- function(time, event, marker, weights, vi){
 
 processRawOutput <- function(myests, CImethod, alpha){
 
-
+if(is.null(myests$se)){ 
+  myests$ci.bounds <- rbind(rep(NA, 6), rep(NA, 6));
+  myests$se <- rep(NA, 6)
+}else{
 #calculate confidence intervals
 if(substr(CImethod, 1, 4)=="stan"){
   
-  myests$CIbounds = data.frame(rbind(upper = myests$estimates - qnorm(alpha/2)*myests$se, 
+  myests$ci.bounds = data.frame(rbind(upper = myests$estimates - qnorm(alpha/2)*myests$se, 
                                      lower = myests$estimates - qnorm(1-alpha/2)*myests$se))
-  names(myests$CIbounds) = names(myests$estimates)
+  names(myests$ci.bounds) = names(myests$estimates)
   
 }else{
   #logit transform everything but the coef
 
   mynames = names(myests$estimates)
-  myests$CIbounds = data.frame(rbind(upper = expit(logit(myests$estimates[,mynames!="coef"]) - 
+  myests$ci.bounds = data.frame(rbind(upper = expit(logit(myests$estimates[,mynames!="coef"]) - 
                                                      qnorm(alpha/2)*myests$se[,mynames!="coef"]/(myests$estimates[,mynames!="coef"]*(1-myests$estimates[,mynames!="coef"]))), 
                                      lower = expit(logit(myests$estimates[,mynames!="coef"]) - 
                                                      qnorm(1-alpha/2)*myests$se[,mynames!="coef"]/(myests$estimates[,mynames!="coef"]*(1-myests$estimates[,mynames!="coef"])))))
   
   if(is.element("coef", mynames)){
-  myests$CIbounds = cbind(data.frame(rbind(upper = myests$estimates[,mynames=="coef"] - qnorm(alpha/2)*myests$se[,mynames=="coef"], 
-                                           lower = myests$estimates[,mynames=="coef"] - qnorm(1-alpha/2)*myests$se[,mynames=="coef"])), myests$CIbounds)
+  myests$ci.bounds = cbind(data.frame(rbind(upper = myests$estimates[,mynames=="coef"] - qnorm(alpha/2)*myests$se[,mynames=="coef"], 
+                                           lower = myests$estimates[,mynames=="coef"] - qnorm(1-alpha/2)*myests$se[,mynames=="coef"])), myests$ci.bounds)
   }
-  names(myests$CIbounds) = names(myests$estimates)
+  names(myests$ci.bounds) = names(myests$estimates)
   
+}
 }
 myests
 }

@@ -34,8 +34,8 @@ print.SurvMTP_cch <- function(x, ...){
     cat(paste(sprintf("%-6s", mynames[i]), 
               sprintf("%10.3f", round(x$estimate[i], 3)), 
               sprintf("%10.3f ", round(x$se[i], 3)), 
-              sprintf("%13.3f ", round(x$CIbounds[2,i], 3)), 
-              sprintf("%11.3f ", round(x$CIbounds[1,i], 3)),
+              sprintf("%13.3f ", round(x$ci.bounds[2,i], 3)), 
+              sprintf("%11.3f ", round(x$ci.bounds[1,i], 3)),
                sep = "")); 
     cat("\n")
     
@@ -81,8 +81,8 @@ print.SurvMTP_ncc <- function(x, ...){
     cat(paste(sprintf("%-6s", mynames[i]), 
               sprintf("%10.3f", round(x$estimate[i], 3)), 
               sprintf("%10.3f ", round(x$se[i], 3)), 
-              sprintf("%13.3f ", round(x$CIbounds[2,i], 3)), 
-              sprintf("%11.3f ", round(x$CIbounds[1,i], 3)),
+              sprintf("%13.3f ", round(x$ci.bounds[2,i], 3)), 
+              sprintf("%11.3f ", round(x$ci.bounds[1,i], 3)),
               sep = "")); 
     cat("\n")
     

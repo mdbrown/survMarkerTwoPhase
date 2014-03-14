@@ -5,7 +5,7 @@ survMTP.cch <- function(time, event, marker, weights,
                              estimation.method = 'NP', 
                              predict.time, 
                              marker.cutpoint = 'median',
-                             CImethod = "standard",
+                             ci.method = "logit.transformed",
                              alpha=0.05
                            ){
   
@@ -40,8 +40,8 @@ survMTP.cch <- function(time, event, marker, weights,
   
   subcohort.data = data[vi==1,]
   
-  #CImethod is either "standard" or "logit.transformed" 
-  if(!is.element(substr(CImethod, 1,4), c("stan", "logi"))) stop("CImethod must be either 'standard' or 'logit.transformed'")
+  #ci.method is either "standard" or "logit.transformed" 
+  if(!is.element(substr(ci.method, 1,4), c("stan", "logi"))) stop("ci.method must be either 'standard' or 'logit.transformed'")
 
   #SEmethod is either "normal" or "boostrap"
   if(!is.element(substr(SEmethod, 1,4), c("norm", "boot"))) stop("SEmethod must be either 'normal' or 'bootstrap'")
@@ -91,7 +91,7 @@ survMTP.cch <- function(time, event, marker, weights,
                                       cutpoint = cutoff,  
                                       measures = measures,
                                       predict.time = predict.time,
-                                      CalVar = TRUE,  
+                                      CalVar = FALSE,  
                                       subcohort = TRUE)
 
   }else{
@@ -99,11 +99,11 @@ survMTP.cch <- function(time, event, marker, weights,
     stop("estimation.method not set correctly: it must be one of `SP` (or 'semiparametric') or 'NP' (or 'nonparametric')")
   }
 
-  myests <- processRawOutput(estRawOutput, CImethod = "standard", alpha)
+  myests <- processRawOutput(estRawOutput, CImethod = ci.method, alpha)
   myests$fit = NULL
   myests$model.fit <- estRawOutput$fit; 
   myests$marker.cutpoint = marker.cutpoint; 
-  #myests$CImethod = CImethod; 
+  myests$ci.method = ci.method; 
   #myests$SEmethod = SEmethod;
   myests$predict.time = predict.time; 
   myests$alpha = alpha; 

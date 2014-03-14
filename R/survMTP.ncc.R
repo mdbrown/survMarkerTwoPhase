@@ -8,6 +8,7 @@ survMTP.ncc <- function(time,
                         data,
                         sets, 
                         estimation.method = "NP", 
+                        ci.method = "logit.transformed",
                         predict.time,
                         alpha = 0.05, 
                         Npert = 500, 
@@ -114,11 +115,11 @@ survMTP.ncc <- function(time,
     stop("estimation.method not set correctly: must be either 'NP' for non-parametric or 'SP' for semi-parametric")
   }
 
-  myests <- processRawOutput(result, CImethod = "standard", alpha)
+  myests <- processRawOutput(result, CImethod = ci.method, alpha)
   myests$fit = NULL
   myests$model.fit <- result$fit; 
   myests$marker.cutpoint = marker.cutpoint; 
-  #myests$CImethod = CImethod; 
+  myests$ci.method = ci.method; 
   #myests$SEmethod = SEmethod;
   myests$predict.time = predict.time; 
   myests$alpha = alpha; 
