@@ -79,9 +79,9 @@
 	</section>
 	-->
       <section id="main_content" class="inner">
-        <p>This R package computes non-parametric and semi-parametric estimates of accuracy measures for risk prediction markers from survival data under two phase study designs, namely the case-cohort (cch) and the nested case-control (ncc) study designs. Semi-parametric estimates assume a cox proportional hazards model, while non-parametric calculations use kernel based smoothing to obtain estimates.  </p>
+        <p>This R package computes non-parametric and semi-parametric estimates of accuracy measures for risk prediction markers from survival data under two phase study designs, namely the case-cohort (cch) and the nested case-control (ncc) study designs.</p>
 
-<p>The accuracy measures that can be estimated include the <strong>AUC</strong>, <strong>TPR(c)</strong>, <strong>FPR(c)</strong>, <strong>PPV(c)</strong>, and <strong>NPV(c)</strong> for for a specific timepoint and fixed marker cutoff value c. Standard errors, along with normal approximated confidence intervals can be calculated under the ncc design, but are unavailable for the cch design as of now. Standard errors are calculated using perturbation methods. </p>
+<p>The accuracy measures that can be estimated include the <strong>AUC</strong>, <strong>TPR(c)</strong>, <strong>FPR(c)</strong>, <strong>PPV(c)</strong>, and <strong>NPV(c)</strong> for for a specific timepoint and fixed marker cutoff value c. Standard errors, along with normal approximated confidence intervals are also calculated. <em>Note: standard errors for non-parametric estimates from a cch design are currently not available</em>.</p>
 
 <p>Below is a brief <a href = "#tutorial">tutorial</a> to get you started. Results from a small simulation to serve as <a href = "#validation">package validation</a> are then shown. For more information regarding estimation procedures see the <a href = "#references">references</a>. </p>
 
@@ -160,25 +160,26 @@
 <span class="c">cohortData_cch$Y[sampleInd == 0] = NA</span>
 </pre></div>
 
-<p>Here we estimate using non-parametric estimation methods.   </p>
-
+<p>Here we estimate using non-parametric estimation methods using double inverse probability weighting.</p>
 <div class="highlight highlight-r"><pre><span class="c"># estimate accuracy measures using non-parametric estimates by setting</span>
 <span class="c"># estimation.method = 'NP'</span>
 <span class="c">survMTP.cch(time = survTime, event = status, marker = Y, weights = weights, </span>
 <span class="c">    subcoh = subcohort, data = cohortData_cch, estimation.method = "NP", predict.time = 2, </span>
 <span class="c">    marker.cutpoint = 0)</span>
 </pre></div>
-
+<pre><code>## Warning: Standard error calculations are not available for non-parametric
+## estimates yet.</code></pre>
 <pre><code>##
 ##  Non-parametric estimates under Case-Cohort study design.
-##
-##         estimate
-## AUC        0.749
-## TPR(c)     0.699
-## FPR(c)     0.394
-## PPV(c)     0.331
-## NPV(c)     0.878
-##
+## 
+##         estimate     se      lower 0.95  upper 0.95
+## 
+## AUC        0.749        NA            NA          NA 
+## TPR(c)     0.699        NA            NA          NA 
+## FPR(c)     0.394        NA            NA          NA 
+## PPV(c)     0.331        NA            NA          NA 
+## NPV(c)     0.878        NA            NA          NA 
+## 
 ##  marker cutpoint: c = 0
 </code></pre>
 
@@ -192,15 +193,16 @@
 
 <pre><code>##
 ##  Semi-parametric estimates under Case-Cohort study design.
-##
-##         estimate
-## coef       1.088
-## AUC        0.788
-## TPR(c)     0.770
-## FPR(c)     0.347
-## PPV(c)     0.386
-## NPV(c)     0.909
-##
+## 
+##         estimate     se      lower 0.95  upper 0.95
+## 
+## coef       1.088     0.083         0.926       1.249 
+## AUC        0.788     0.026         0.731       0.835 
+## TPR(c)     0.770     0.032         0.701       0.828 
+## FPR(c)     0.347     0.047         0.261       0.444 
+## PPV(c)     0.386     0.050         0.294       0.487 
+## NPV(c)     0.909     0.022         0.855       0.945 
+## 
 ##  marker cutpoint: c = 0
 </code></pre>
 
@@ -209,7 +211,7 @@
 <h3>
 <a name="nested-case-control" class="anchor" href="#nested-case-control"><span class="octicon octicon-link"></span></a><a id="ncc">Nested case-control</a></h3>
 
-<p>For a nested case-control sample, we need to input the full cohort data, with an indicator for inclusion in the subcohort, as well as a dataframe of selected sets, where each row is a case id followed by the corresponding id's that were matched to it. </p>
+<p>For a nested case-control sample, we need to input the full cohort data, with an indicator for inclusion in the subcohort, as well as a dataframe of selected sets, where each row is a case id followed by the corresponding id’s that were matched to it.</p>
 
 <p>Generate a nested case-control subcohort using the function <code>ccwc</code> from the <a href="http://cran.r-project.org/web/packages/Epi/index.html"><code>Epi</code></a> package. </p>
 
@@ -245,8 +247,7 @@
 <span class="c">}</span>
 </pre></div>
 
-<p>Now we are ready to calculate the measures using <code>survMTP.ncc</code>. </p>
-
+<p>Now we are ready to calculate the measures using <code>survMTP.ncc</code>. Standard errors for both SP and NP estimates are calculated using perturbation. NP estimates use kernel smoothing while SP estimates assume a Cox proportional hazards model.</p>
 <div class="highlight highlight-r"><pre><span class="c"># Nonparametric estimates</span>
 <span class="c">survMTP.ncc(time = survTime, event = status, marker = Y, subcoh = subcohort, </span>
 <span class="c">    id = id, data = cohortData_ncc, sets = Sets, estimation.method = "NP", </span>
@@ -255,15 +256,15 @@
 
 <pre><code>##
 ##  Non-parametric estimates under Nested Case-Control study design.
-##
+## 
 ##         estimate     se      lower 0.95  upper 0.95
-##
-## AUC        0.742     0.027         0.690       0.795
-## FPR(c)     0.379     0.032         0.316       0.443
-## TPR(c)     0.684     0.044         0.598       0.770
-## NPV(c)     0.875     0.020         0.837       0.914
-## PPV(c)     0.335     0.033         0.270       0.401
-##
+## 
+## AUC        0.742     0.027         0.687       0.791 
+## FPR(c)     0.379     0.032         0.318       0.445 
+## TPR(c)     0.684     0.044         0.592       0.763 
+## NPV(c)     0.875     0.020         0.831       0.909 
+## PPV(c)     0.335     0.033         0.273       0.404 
+## 
 ##  marker cutpoint: c = 0
 </code></pre>
 
@@ -275,16 +276,16 @@
 
 <pre><code>##
 ##  Semi-parametric estimates under Nested Case-Control study design.
-##
+## 
 ##         estimate     se      lower 0.95  upper 0.95
-##
-## coef       1.017     0.082         0.857       1.177
-## AUC        0.777     0.020         0.738       0.815
-## FPR(c)     0.356     0.030         0.297       0.416
-## TPR(c)     0.755     0.030         0.696       0.813
-## NPV(c)     0.900     0.013         0.875       0.926
-## PPV(c)     0.381     0.032         0.319       0.443
-##
+## 
+## coef       1.017     0.082         0.857       1.177 
+## AUC        0.777     0.020         0.736       0.813 
+## FPR(c)     0.356     0.030         0.300       0.418 
+## TPR(c)     0.755     0.030         0.691       0.808 
+## NPV(c)     0.900     0.013         0.871       0.924 
+## PPV(c)     0.381     0.032         0.321       0.444 
+## 
 ##  marker cutpoint: c = 0
 </code></pre>
 
