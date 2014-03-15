@@ -1,9 +1,9 @@
 survMarkerTwoPhase
 =============================================
 
-This R package computes non-parametric and semi-parametric estimates of accuracy measures for risk prediction markers from survival data under two phase study designs, namely the case-cohort (cch) and the nested case-control (ncc) study designs. Semi-parametric estimates assume a cox proportional hazards model, while non-parametric calculations use kernel based smoothing to obtain estimates.  
+This R package computes non-parametric and semi-parametric estimates of accuracy measures for risk prediction markers from survival data under two phase study designs, namely the case-cohort (cch) and the nested case-control (ncc) study designs. 
 
-The accuracy measures that can be estimated include the **AUC**, **TPR(c)**, **FPR(c)**, **PPV(c)**, and **NPV(c)** for for a specific timepoint and fixed marker cutoff value c. Standard errors, along with normal approximated confidence intervals are also calculated. 
+The accuracy measures that can be estimated include the **AUC**, **TPR(c)**, **FPR(c)**, **PPV(c)**, and **NPV(c)** for for a specific timepoint and fixed marker cutoff value c. Standard errors, along with normal approximated confidence intervals are also calculated. *Note: standard errors for non-parametric estimates from a cch design are currently not available*.  
 
 Below is a brief tutorial to get you started. For more information regarding estimation procedures see the references below. 
 
@@ -70,7 +70,8 @@ cohortData_cch$subcohort = sampleInd
 cohortData_cch$Y[sampleInd==0] = NA  
 
 ```
-Here we estimate using non-parametric estimation methods.   
+
+Here we estimate using non-parametric estimation methods using double inverse probability weighting.   
 
 ```{r}
 #estimate accuracy measures using non-parametric estimates
@@ -144,7 +145,7 @@ for(i in subcohort_ncc$Set){
 
 ```
 
-Now we are ready to calculate the measures using `survMTP.ncc`. 
+Now we are ready to calculate the measures using `survMTP.ncc`. Standard errors for both SP and NP estimates are calculated using perturbation. NP estimates use kernel smoothing while SP estimates assume a Cox proportional hazards model. 
 
 ```{r}
 #Nonparametric estimates 
