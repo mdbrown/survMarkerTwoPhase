@@ -91,7 +91,7 @@ survMTP.cch <- function(time, event, marker, weights,
                                       cutpoint = cutoff,  
                                       measures = measures,
                                       predict.time = predict.time,
-                                      CalVar = TRUE,  
+                                      CalVar = FALSE,  
                                       subcohort = TRUE)
 
   }else{
