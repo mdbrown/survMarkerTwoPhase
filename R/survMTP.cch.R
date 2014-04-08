@@ -84,14 +84,14 @@ survMTP.cch <- function(time, event, marker, weights,
     
     
   }else if(is.element(estimation.method, c("N", "NP", "Non-Parametric", "nonparametric"))){
-    warning("Standard error calculations are not available for non-parametric estimates yet.")
+   # warning("Standard error calculations are not available for non-parametric estimates yet.")
     mydata <- prepareDataNP(time, event, marker, weights, vi)  
     estRawOutput <- getEstimatesNP( subcohort.data = mydata$subdata,
                                     cohort.data = mydata$cohortdata,
                                       cutpoint = cutoff,  
                                       measures = measures,
                                       predict.time = predict.time,
-                                      CalVar = FALSE,  
+                                      CalVar = TRUE,  
                                       subcohort = TRUE)
 
   }else{
@@ -100,6 +100,7 @@ survMTP.cch <- function(time, event, marker, weights,
   }
 
   myests <- processRawOutput(estRawOutput, CImethod = ci.method, alpha)
+  myests$se.cohort = estRawOutput$se.coh
   myests$fit = NULL
   myests$model.fit <- estRawOutput$fit; 
   myests$marker.cutpoint = marker.cutpoint; 

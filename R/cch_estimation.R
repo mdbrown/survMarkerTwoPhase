@@ -54,22 +54,22 @@ getEstimatesSP <- function(data,
   data.RT <- cbind(data.RT[,-c(3)],Fck) 
   
   ###
-  
-  
-  
-  
+
+  cutoff.type = "yes"
   if(cutoff.type != "none"){
     
-    # cutoffs <- unique(sort(c( cutpoint, quantile(linearY, (1:cutoffN/cutoffN), type =1, na.rm = TRUE))))
-    cutoffs <- unique(sort(c( quantile(linearY, (1:cutoffN/cutoffN), type =1, na.rm = TRUE))))
+    #if we use cutoffs, not used in the released version of package
+    cutoffN <- min(N, 100)
+    cutoffs <- unique(sort(c( cutpoint, quantile(linearY, (1:cutoffN/cutoffN), type =1, na.rm = TRUE))))
     
     cutpos = sum.I(cutoffs,">=", linearY[ooo])
     subdata.RT = data.RT[cutpos, ]
     
     RT.out = EstRTall(subdata.RT) 
     
+    AUC    <- RT.out[[2]]
     RT.out <- RT.out[[1]]
-    AUC   = sum(RT.out$TPR*(RT.out$FPR-c(RT.out$FPR[-1],0)))
+    
     
   }else{
     
@@ -78,7 +78,6 @@ getEstimatesSP <- function(data,
     RT.out    <- RT.out[[1]]
     
   }
-  
   
   
   if (length(measures[measures!="AUC"])>0) {
@@ -106,7 +105,7 @@ getEstimatesSP <- function(data,
     
     subdata = cbind(data[ooo,],data.RT[,c(2)], linearY[ooo])
     names(subdata)=c("times","status","y","wi","vi","Sy","linearY")
-    
+    if(cutoff.type=="none") cutoffs = NA
     jjunk = Est.Wexp.cpp(subdata, 
                          N,
                          RT.out,
@@ -115,15 +114,21 @@ getEstimatesSP <- function(data,
                          typex,
                          typey, 
                          resid(fit, "score")[ooo], 
-                         fit$var)
+                         fit$var, 
+                         cutoffs = cutoffs)
     
     Wexp = data.frame(cbind(jjunk$Wexp.beta,jjunk$Wexp.AUC,jjunk$Wexp.vp))
+
+    tmpse = Est.Var.CCH.trueweights(N,Wexp,subdata,subdata$status, subcohort=TRUE) 
     
-    se = sqrt(Est.Var.CCH.trueweights(N,Wexp,subdata,subdata$status, subcohort))  
+    se <- sqrt(tmpse$cch.variance)
+    se.coh <- sqrt(tmpse$cohort.variance)
     
     se <- data.frame(t(se))
+    se.coh<- data.frame(t(se.coh))
     names(se) = c("coef", measures)
-    list(estimates = est, se = se, fit = fit) 
+    names(se.coh) = c("coef", measures)
+    list(estimates = est, se = se, fit = fit, se.coh = se.coh) 
     
     
   } else {list(estimates = data.frame(est), fit = fit)}
@@ -215,25 +220,33 @@ getEstimatesNP <- function(subcohort.data,
     U.AUC = (xk<=t0)/(1-St0)*(1-FPR.ck-AUC)+(xk>t0)/St0*(TPR.ck-AUC)
     
     Wexp.np.AUC = CWk*U.AUC+Phi%*%(wgtk*CWk*U.AUC)/sum(wgtk)
-    se.auc = sqrt(Est.Var.CCH.trueweights(N,Wexp.np.AUC,data,data$si, subcohort=FALSE))
+    se.auc = Est.Var.CCH.trueweights(N,Wexp.np.AUC,data,data$si, subcohort=TRUE)
     se.u0 = NULL
     
     se.c0 = NULL
+    se.coh = NULL
+    
     if (!is.null(c0)) {
       npc = length(U.ACC.c0)  
       for(kk in 1:npc){ 
         
         U.ACC.c0[[kk]] = U.ACC.c0.tmp[[kk]]
         Wexp.c0[[kk]] = CWk*U.ACC.c0[[kk]]+Phi%*%(wgtk*CWk*U.ACC.c0[[kk]])/sum(wgtk)
-        se.c0 = c(se.c0,sqrt(Est.Var.CCH.trueweights(N,data.frame(Wexp.c0[[kk]]),data,data$si, subcohort=subcohort)))
+        tmp.se <- Est.Var.CCH.trueweights(N,data.frame(Wexp.c0[[kk]]),data,data$si, subcohort=subcohort)
+        se.c0  = c(se.c0,tmp.se$cch.variance)
+        se.coh = c(se.coh, tmp.se$cohort.variance) 
       }
-      se.c0 = data.frame(matrix(se.c0,nrow=length(c0)))
-      names(se.c0) = nm.acc    
+      se.c0 = data.frame(sqrt(matrix(se.c0,nrow=length(c0))))
+      se.coh = data.frame(sqrt(matrix(se.coh, nrow = length(c0))))
+      names(se.c0) = names(se.coh) = nm.acc    
     }
     
-    se <- data.frame("AUC" = se.auc, se.c0)
-    se <- se[,measures] 
-    list("estimates" = est,"se" =se) 
+    se <- data.frame("AUC" = sqrt(se.auc$cch.variance), se.c0)
+    se.coh <- data.frame("AUC" = sqrt(se.auc$cohort.variance), se.coh)
+    
+    se <- se[,measures]
+    se.coh <- se.coh[,measures]
+    list("estimates" = est,"se" =se, "se.coh" = se.coh) 
   }	
   
   

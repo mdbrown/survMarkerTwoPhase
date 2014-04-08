@@ -17,8 +17,9 @@ WGT.FUN <- function(newdata, data, w.ptb=NULL, t0)
 }
 
 
+
 Est.Wexp.cpp <-
-  function(data,N,RT.out,predict.time,uu0Vec,typexVec,typeyVec, resid.sco, fit.var) {
+  function(data,N,RT.out,predict.time,uu0Vec,typexVec,typeyVec, resid.sco, fit.var, cutoffs) {
     
     if(missing(data))      { stop("Est.Wexp0: data not specified") }  
     
@@ -49,9 +50,30 @@ Est.Wexp.cpp <-
     
     #dataD    =  subset(data[order(data$times),],status==1)  
     
-
-    Wexp.all <- getWEXP(as.matrix(data), as.matrix(Y), N, as.matrix(RT.out), predict.time, c(resid.sco), fit.var);
-    
+    if(is.na(cutoffs)[1]){
+      Wexp.all <- getWEXP(as.matrix(data), as.matrix(Y), N, as.matrix(RT.out), predict.time, c(resid.sco), fit.var);
+    }else{
+      
+      cutpos = sum.I(cutoffs,">=", data$linearY)
+      
+      Y.sub <- as.matrix(Y[cutpos,])
+      subdata <- data[cutpos,]
+      
+      ncut = nrow(subdata)
+      
+      np = dim(Y)[2]
+      
+      
+      Wexp.all <- getWEXPcutoff(as.matrix(data),
+                                as.matrix(subdata),
+                                Y = as.matrix(Y),
+                                Y.sub,
+                                N, as.matrix(RT.out), 
+                                predict.time, c(resid.sco), fit.var, 
+                                cutoffs);
+      
+      
+    }
     ## now get iid expansion for other accuracy summaries
     ## global summaries 
     ## AUC = sum(RT.out$TPR*(RT.out$FPR-c(RT.out$FPR[-1],0)))
@@ -64,7 +86,7 @@ Est.Wexp.cpp <-
     #             (Wexp.all[[1]]-cbind(0,Wexp.all[[1]][,-mmm]))%*%RT.out$TPR
     #Wexp.IFPR = Wexp.all[[3]]%*%(RT.out$RiskT-c(0,RT.out$RiskT[-mmm]))+
     #             (Wexp.all[[1]]-cbind(0,Wexp.all[[1]][,-mmm]))%*%RT.out$FPR
-    #Wexp.IDI= Wexp.ITPR - Wexp.IFPR 	
+    #Wexp.IDI= Wexp.ITPR - Wexp.IFPR   
     #Wexp.AUC = Wexp.all[[4]]%*%(RT.out$FPR-c(RT.out$FPR[-1],0))+(Wexp.all[[3]]-cbind(Wexp.all[[3]][,-1],0))%*%RT.out$TPR
     Wexp.AUC = cbind(0,Wexp.all[[4]])%*%(c(1,RT.out$FPR)-c(RT.out$FPR,0))+
       (cbind(0,Wexp.all[[3]])-cbind(Wexp.all[[3]],0))%*%c(1,RT.out$TPR)
@@ -95,7 +117,32 @@ Est.Wexp.cpp <-
   }
 
 
+##non parametric
+
+
+Phi.C.new.FUN<-function(xk,dk,Ti, Di, t0)
+{
+  #xk=xi; #dk=data[,7]; 
+  
+  tt=pmin(xk,t0); 
+  TT=sort(unique(pmin(Ti[Di==0], t0)));
+  nk=length(xk); N=length(Ti)
+  junk=summary(survfit(Surv(Ti,1-Di)~1, se.fit=F, type='fl'), TT)
+  pi=junk$n.risk/N
+  dLambda=junk$n.event/junk$n.risk
+  #c(0, diff(junk$surv))
+  tmp.ti=rep(xk, each=nk)
+  tmp.tj=rep(xk, nk)
+  tmp.t=pmin(tmp.ti, tmp.tj, t0)
+  phi2=matrix(sum.I(tmp.t, ">=", TT, dLambda/pi), nk, nk)
+  tmpind <- rank(tt); 
+  pk=summary(survfit(Surv(Ti,1-Di)~1, se.fit=F, type='fl'), sort(tt))$n.risk[tmpind]/N
+  phi1=matrix((tmp.ti<=tmp.tj)*rep(1-dk, each=nk)/rep(pk, nk), nk, nk)
+  phi=phi1-phi2
+  t(phi)
+  #  row of the output is for subject
+  #  colum of the output is for time
+}
 
 
 
-##### NON-PARAMETRIC

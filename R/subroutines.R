@@ -114,7 +114,7 @@ Est.Var.CCH.trueweights = function(N,Wexp,data,stratum, subcohort) {
     tempstratavar = (ns-1)*(straWt[1]-1)*straWt[1]*apply(straWexp/N,2,var)
     strvar = strvar + tempstratavar
   }
-     return(cohort.variance+strvar)
+     return(list(cohort.variance = cohort.variance, cch.variance = cohort.variance+strvar))
   }else{
     return(cohort.variance)
   }
