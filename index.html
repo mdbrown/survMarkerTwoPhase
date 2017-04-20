@@ -100,11 +100,19 @@
 <h3>
 <a name="download-and-install-the-package" class="anchor" href="#download-and-install-the-package"><span class="octicon octicon-link"></span></a>Download and install the package</h3>
 
+	      
+	      
 <div class="highlight highlight-r"><pre><span class="c"># download the package from github</span>
 <span class="c">if (!require("devtools")) install.packages("devtools")</span>
-<span class="c">devtools::install_github("survMarkerTwoPhase", "mdbrown", args="--no-multiarch")</span>
+<span class="c">devtools::install_github("mdbrown/survMarkerTwoPhase")</span>
 </pre></div>
+	      
+<p>If this does not work, you can download the source code here: <a href = "https://github.com/mdbrown/survMarkerTwoPhase/releases/">https://github.com/mdbrown/survMarkerTwoPhase/releases/</a>  </p>
 
+<div class="highlight highlight-r"><pre><span class="c"># download the package from local source</span>
+<span class="c">devtools::install_github("..(path_to_file).../survMarkerTwoPhase_1.2.tar.gz", repos = NULL)</span>
+</pre></div>
+	      
 <div class="highlight highlight-r"><pre><span class="c">library(survMarkerTwoPhase)</span>
 
 <span class="c"># simulated data for illustration</span>
