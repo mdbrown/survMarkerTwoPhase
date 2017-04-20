@@ -17,7 +17,7 @@ Below is a brief tutorial to get you started. For more information regarding est
 ```r
 # download the package from github
 if (!require("devtools")) install.packages("devtools")
-devtools::install_github("survMarkerTwoPhase", "mdbrown")
+devtools::install_github("mdbrown/survMarkerTwoPhase")
 ```
 
 
