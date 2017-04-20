@@ -1,8 +1,8 @@
 Package: survMarkerTwoPhase
 Type: Package
 Title: Evaluate the prognostic accuracy of a marker under two phase designs
-Version: 1.1
-Date: 2014-01-21
+Version: 1.2
+Date: 2017-04-20
 Author: Yingye Zheng, Tianxi Cai, and Marshall Brown
 Maintainer: Marshall Brown <mdbrown@fhcrc.org>
 Description: This package provides a function to compute estimates of the AUC, TPR(c),
